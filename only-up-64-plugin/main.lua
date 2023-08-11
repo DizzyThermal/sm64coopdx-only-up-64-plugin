@@ -218,5 +218,5 @@ hook_mario_action(ACT_AIR_HIT_WALL,      { every_frame = act_air_hit_wall })
 hook_mario_action(ACT_GROUND_POUND_JUMP, { every_frame = act_ground_pound_jump })
 hook_mario_action(ACT_WALL_SLIDE,        { every_frame = act_wall_slide, gravity = act_wall_slide_gravity })
 
-hook_chat_command('only_up_show_height', 'On|Off - Show character height on HUD. Default is On.', HeightToggle)
-hook_chat_command('only_up_moveset', 'On|Off - Enable Only Up 64 moveset. Default is On.', MovesetToggle)
+hook_chat_command('only_up_show_height', 'On|Off - Show character height on HUD (Y). Default is On.', HeightToggle)
+hook_chat_command('only_up_moveset', 'On|Off - Enable Only Up 64 Moveset. Default is On.', MovesetToggle)
