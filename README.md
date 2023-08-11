@@ -9,7 +9,7 @@
 
 ## Chat Commands
 
-* `/only_up_show_height on|off` - Show character height on HUDi (Y). Default is On.
+* `/only_up_show_height on|off` - Show character height (Y) on HUD. Default is On.
 * `/only_up_moveset on|off` - Enable Only Up 64 Moveset. Default is On.`
 
 ## Known Issues
