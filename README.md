@@ -6,21 +6,26 @@
 
 ### Show Height (Y-Coordinate) on HUD:
 
+* `/only_up_show_height on|off` - Show character height (Y) on HUD. Default is On.
+
 ![y-coordinate](./resources/y-coordinate.gif)
 
 ### Wallslide
+#### _(Modified from: mods/extended-moveset.lua)_
 
 ![wallslide](./resources/wallslide.gif)
 
-### Ground Pound Twirl
+### Ground Pound Twirl (Z, A)
 
 ![ground-pound-twirl](./resources/ground-pound-twirl.gif)
 
-### Ground Pound Jump
+### Ground Pound Jump (Z, A on ground)
+#### _(Modified from: mods/extended-moveset.lua)_
 
 ![ground-pound-jump](./resources/ground-pound-jump.gif)
 
-### Ground Pound Dive
+### Ground Pound Dive (Z, B)
+#### _(Modified from: mods/extended-moveset.lua)_
 
 ![ground-pound-dive](./resources/ground-pound-dive.gif)
 
