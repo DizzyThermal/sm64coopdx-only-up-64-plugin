@@ -1,16 +1,23 @@
 # sm64ex-coop-only-up-64-plugin
 
-* Adds a Character Height (Y) to the HUD
-* Adds Only Up 64 Character Moveset:
-  * Wallslide
-  * Ground Pound Jump (GP, A on ground)
-  * Ground Pound Twirl (GP, A)
-  * Ground Pound Dive (GP, B)
+## Features
+
+### Show Height (Y-Coordinate)
+
+* Show character height (Y-Coordinate) on HUD:
+
+![y-coordinate](./resources/y-coordinate.gif)
 
 ## Chat Commands
 
 * `/only_up_show_height on|off` - Show character height (Y) on HUD. Default is On.
 * `/only_up_moveset on|off` - Enable Only Up 64 Moveset. Default is On.`
+
+## Changes
+
+* Decreased Ground Pound Twirl Y-Boost (42.0 -> 40.0)
+* Decreased Ground Pound Twirl Count (20 -> 10)
+* Allow Wallslide after Long Jump (Like Only Up 64)
 
 ## Known Issues
 

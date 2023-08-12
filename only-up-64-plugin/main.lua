@@ -7,6 +7,7 @@ local enable_only_up_moveset = true
 
 local twirling = false
 local twirl_counter = 0
+local twirl_count = 10
 local animation_counter = 0
 
 -- Actions
@@ -149,6 +150,9 @@ function mario_on_set_action(m)
         m.vel.y = 65.0
     elseif m.action == ACT_WALL_SLIDE then
         m.vel.y = 0.0
+    elseif (m.action == ACT_BACKWARD_AIR_KB or m.action == ACT_SOFT_BONK) and (m.prevAction ~= ACT_DIVE and m.prevAction ~= ACT_LEDGE_GRAB) then
+        m.faceAngle.y = m.faceAngle.y + 0x8000
+        set_mario_action(m, ACT_WALL_SLIDE, 0)
     end
 end
 
@@ -166,7 +170,7 @@ function mario_update(m)
     if m.action == ACT_GROUND_POUND and (m.input & INPUT_A_PRESSED) ~= 0 then
         twirling = true
         twirl_counter = 0
-        m.vel.y = 42.0
+        m.vel.y = 40.0
         set_mario_action(m, ACT_TWIRLING, 0)
     end
 
@@ -180,12 +184,10 @@ function frame_check()
     local m = gMarioStates[0]
 
     twirl_counter = twirl_counter + 1
-    if twirling and twirl_counter >= 20 then
+    if twirling and twirl_counter >= twirl_count then
         twirling = false
         twirl_counter = 0
         set_mario_action(m, ACT_FORWARD_ROLLOUT, 0)
-        -- set_mario_animation(m, MARIO_ANIM_GENERAL_FALL)
-        -- set_anim_to_frame(m, 1)
     end
 end
 
@@ -218,5 +220,5 @@ hook_mario_action(ACT_AIR_HIT_WALL,      { every_frame = act_air_hit_wall })
 hook_mario_action(ACT_GROUND_POUND_JUMP, { every_frame = act_ground_pound_jump })
 hook_mario_action(ACT_WALL_SLIDE,        { every_frame = act_wall_slide, gravity = act_wall_slide_gravity })
 
-hook_chat_command('only_up_show_height', 'On|Off - Show character height (Y) on HUD. Default is On.', HeightToggle)
-hook_chat_command('only_up_moveset', 'On|Off - Enable Only Up 64 Moveset. Default is On.', MovesetToggle)
+hook_chat_command('only_up_show_height', 'On|Off - Show character height on HUD. Default is On.', HeightToggle)
+hook_chat_command('only_up_moveset', 'On|Off - Enable Only Up 64 moveset. Default is On.', MovesetToggle)
