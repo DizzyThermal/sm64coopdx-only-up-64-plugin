@@ -1,12 +1,28 @@
-# sm64ex-coop-only-up-64-plugin
+# Only Up 64 Plugin (sm64ex-coop)
+
+* Note: This is NOT the Only Up 64 Map. This is a mod to add character height (Y-Position) and the Only Up 64 moveset.
 
 ## Features
 
-### Show Height (Y-Coordinate)
-
-* Show character height (Y-Coordinate) on HUD:
+### Show Height (Y-Coordinate) on HUD:
 
 ![y-coordinate](./resources/y-coordinate.gif)
+
+### Wallslide
+
+![wallslide](./resources/wallslide.gif)
+
+### Ground Pound Twirl
+
+![ground-pound-twirl](./resources/ground-pound-twirl.gif)
+
+### Ground Pound Jump
+
+![ground-pound-jump](./resources/ground-pound-jump.gif)
+
+### Ground Pound Dive
+
+![ground-pound-dive](./resources/ground-pound-dive.gif)
 
 ## Chat Commands
 
