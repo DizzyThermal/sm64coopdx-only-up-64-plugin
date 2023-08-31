@@ -1,6 +1,6 @@
 -- name: Only Up 64 Plugin
 -- author: DizzyThermal
--- description: Adds character height visible on the HUD (Y) and  Only Up 64 Moveset.
+-- description: Adds character height to the HUD/playerlist and adds the Only Up 64 Moveset.
 
 local enable_character_height = true
 local enable_only_up_moveset = true
