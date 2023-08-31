@@ -33,9 +33,11 @@ function print_character_height()
     yPad = 58
     xNegativePad = 16
     yNegativePad = 3
+    mapPad = 16390
+	currentArea = m.area.index
 
     -- Calculate Character Height
-    characterHeight = math.floor(m.pos.y)
+    characterHeight = math.floor((mapPad + (32000 * (m.area.index - 1)) + m.pos.y) / 10)
     negative = false
     if characterHeight < 0 then
         negative = true
@@ -189,26 +191,24 @@ function frame_check()
         twirl_counter = 0
         set_mario_action(m, ACT_FORWARD_ROLLOUT, 0)
     end
+
+    -- Character Heights (Y)
+    if enable_character_height then
+        gPlayerSyncTable[0].height = math.floor((16390 + ((m.area.index - 1) * 32000) + m.pos.y) / 10)
+        for i = 0, MAX_PLAYERS - 1 do
+        network_player_set_description(gNetworkPlayers[i], "Y: " ..tostring(gPlayerSyncTable[i].height), 255, 255, 255, 255)
+        end
+    end
 end
 
 function HeightToggle(msg)
-	  if msg == string.lower('On') or msg == '1' then
-		    enable_character_height = true
-		    return true
-	  elseif msg == string.lower('Off') or msg == '0' then
-		    enable_character_height = false
-		    return true
-	  end
+    enable_character_height = not enable_character_height
+    return true
 end
 
 function MovesetToggle(msg)
-	  if msg == string.lower('On') or msg == '1' then
-		    enable_only_up_moveset = true
-		    return true
-	  elseif msg == string.lower('Off') or msg == '0' then
-		    enable_only_up_moveset = false
-		    return true
-	  end
+	enable_only_up_moveset = not enable_only_up_moveset
+    return true
 end
 
 hook_event(HOOK_ON_HUD_RENDER, print_character_height)
@@ -220,5 +220,5 @@ hook_mario_action(ACT_AIR_HIT_WALL,      { every_frame = act_air_hit_wall })
 hook_mario_action(ACT_GROUND_POUND_JUMP, { every_frame = act_ground_pound_jump })
 hook_mario_action(ACT_WALL_SLIDE,        { every_frame = act_wall_slide, gravity = act_wall_slide_gravity })
 
-hook_chat_command('only_up_show_height', 'On|Off - Show character height on HUD. Default is On.', HeightToggle)
-hook_chat_command('only_up_moveset', 'On|Off - Enable Only Up 64 moveset. Default is On.', MovesetToggle)
+hook_chat_command('only-up-height', '- Toggle displaying character height on HUD and player list', HeightToggle)
+hook_chat_command('only-up-moveset', '- Toggle Only Up 64 Moveset', MovesetToggle)
