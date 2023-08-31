@@ -42,6 +42,10 @@
 
 ## Changes
 
+* Being able to change directions when ground pound diving
+* Using the triple jump action for the ground pound jump (removed original ground pound jump)
+* Sparkles on frame-perfect dive rollouts, wallkicks, and speed kicks.
+* Less jank and higher gravity on the wall slide.
 * Merging changes from the Only Up 64 Alpha Tests
 * Decreased Ground Pound Twirl Y-Boost (42.0 -> 40.0)
 * Decreased Ground Pound Twirl Count (20 -> 10)
@@ -55,5 +59,6 @@
 ## Credits
 
 * Ground Pound Jump, Ground Pound Dive, and Wallslide are from `mods/extended-moveset.lua` with some modifications
+* Moveset contributors: @steven3004
 * sm64ex-coop technical help: @cooliokid956, @andre8739
 * Testing help: @retrodarkgamerx, @cooliokid956
