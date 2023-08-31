@@ -4,9 +4,9 @@
 
 ## Features
 
-### Show Height (Y-Coordinate) on HUD:
+### Toggle Height (Y-Coordinate) on HUD / Player list:
 
-* `/only_up_show_height on|off` - Show character height (Y) on HUD. Default is On.
+* `/only-up-height` - Toggle displaying character height on HUD and player list.
 
 ![y-coordinate](./resources/y-coordinate.gif)
 
@@ -37,11 +37,12 @@
 
 ## Chat Commands
 
-* `/only_up_show_height on|off` - Show character height (Y) on HUD. Default is On.
-* `/only_up_moveset on|off` - Enable Only Up 64 Moveset. Default is On.`
+* `/only-up-height` - Toggle displaying character height on HUD and player list
+* `/only-up-moveset` - Toggle Only Up 64 Moveset
 
 ## Changes
 
+* Merging changes from the Only Up 64 Alpha Tests
 * Decreased Ground Pound Twirl Y-Boost (42.0 -> 40.0)
 * Decreased Ground Pound Twirl Count (20 -> 10)
 * Allow Wallslide after Long Jump (Like Only Up 64)
@@ -55,4 +56,4 @@
 
 * Ground Pound Jump, Ground Pound Dive, and Wallslide are from `mods/extended-moveset.lua` with some modifications
 * sm64ex-coop technical help: @cooliokid956, @andre8739
-* Testing help: @retrodarkgamerx
+* Testing help: @retrodarkgamerx, @cooliokid956
