@@ -35,13 +35,28 @@
 
 ![ground-pound-dive](./resources/ground-pound-dive.gif)
 
+### Warp System (from Alpha Testing)
+
+`/w <area #>`
+
+* Areas 1 - 7 can be warped to
+
+#### Examples
+
+* `/w 1` - Warp to Bottom of Area 1
+* `/w 1 11` - Warp to Top of Area 1
+* `/w 7 11` - Warp to Top of Area 7 (Smoke Stacks)
+* `/w 7 13` - Warp to Top of Area 7 (Mario)
+
 ## Chat Commands
 
 * `/only-up-height` - Toggle displaying character height on HUD and player list
 * `/only-up-moveset` - Toggle Only Up 64 Moveset
+* `/only-up-warps` - Toggle Only Up 64 Warps [Host Only]
 
 ## Changes
 
+* Added Debug Warp system from Only Up 64 Alpha testing to Only Up 64 Plugin (Default Off)
 * Being able to change directions when ground pound diving
 * Using the triple jump action for the ground pound jump (removed original ground pound jump)
 * Sparkles on frame-perfect dive rollouts, wallkicks, and speed kicks.
