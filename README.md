@@ -1,6 +1,6 @@
 # Only Up 64 Plugin (sm64ex-coop)
 
-* Note: This is NOT the Only Up 64 Map. This is a mod to add character height (Y-Position) and the Only Up 64 moveset.
+* Note: This is NOT the [Only Up 64 Map](https://github.com/DizzyThermal/sm64ex-coop-only-up-64)
 
 ## Features
 
