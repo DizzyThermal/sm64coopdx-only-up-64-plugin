@@ -1,6 +1,6 @@
 -- name: Only Up 64 Plugin
 -- author: DizzyThermal and steven3004
--- description: Adds character height visible on the HUD (Y) and  Only Up 64 Moveset.
+-- description: Only Up 64 Plugin\n\nAdds the following features:\n\n  > Character height visible on the HUD (Y) and Playerlist\n  > Only Up 64 Moveset\n  > Warps (Disabled by Default)
 
 local enable_character_height = true
 local enable_only_up_moveset = true
@@ -15,7 +15,7 @@ ACT_WALL_SLIDE = allocate_mario_action(ACT_GROUP_AIRBORNE | ACT_FLAG_AIR | ACT_F
 ACT_KAZE_DIVE_SLIDE = allocate_mario_action(ACT_GROUP_MOVING | ACT_FLAG_MOVING | ACT_FLAG_DIVING | ACT_FLAG_ATTACKING)
 ACT_KAZE_AIR_HIT_WALL = allocate_mario_action(ACT_GROUP_AIRBORNE | ACT_FLAG_AIR)
 
-MOD_NAME = "Only Up 64 Alpha 5"
+MOD_NAME = "Only Up 64 Beta 1"
 function mod_active(mod_name)
     for i in pairs(gActiveMods) do
         if mod_name == gActiveMods[i].name then return true end
@@ -44,14 +44,18 @@ function print_character_height()
     xNegativePad = 16
     yNegativePad = 3
     mapPad = 16390
-	currentArea = m.area.index
+    wallX = 7700
 
     -- Calculate Character Height
     if mod_active(MOD_NAME) then
+        if m.area.index == 7 and m.pos.x > wallX then
+            mapPad = mapPad + 32000
+        end
         characterHeight = math.floor((mapPad + (32000 * (m.area.index - 1)) + m.pos.y) / 10)
     else
         characterHeight = math.floor(m.pos.y)
     end
+
     negative = false
     if characterHeight < 0 then
         negative = true
@@ -253,22 +257,59 @@ function frame_check()
     characterHeight = math.floor(m.pos.y)
     if mod_active(MOD_NAME) then
         mapPad = 16390
+        if m.area.index == 7 and m.pos.x > wallX then
+            mapPad = mapPad + 32000
+        end
         characterHeight = math.floor((mapPad + (32000 * (m.area.index - 1)) + m.pos.y) / 10)
     end
 
     if enable_character_height then
         gPlayerSyncTable[0].height = characterHeight
         for i = 0, MAX_PLAYERS - 1 do
-        network_player_set_description(gNetworkPlayers[i], "Y: " ..tostring(gPlayerSyncTable[i].height), 255, 255, 255, 255)
+            network_player_set_description(gNetworkPlayers[i], "Y: " ..tostring(gPlayerSyncTable[i].height), 255, 255, 255, 255)
         end
     end
 end
 
+function LevelWarp(msg)
+	if not enable_warps then return end
+
+    msg_parts = {}
+    for substring in msg:gmatch("%w+") do table.insert(msg_parts, substring) end
+
+    area = 1
+	act = 0
+    warpId = 10
+
+    if #(msg_parts) > 0 then
+      area = tonumber(msg_parts[1])
+    end
+    if #(msg_parts) > 1 then
+      warpId = tonumber(msg_parts[2])
+    end
+
+    warp_to_warpnode(gNetworkPlayers[0].currLevelNum, area, act, warpId)
+
+    return true
+end
+
+function WarpToggle(msg)
+    if not network_is_server() then return end
+
+	if enable_warps == false then
+		djui_popup_create("Only Up 64 Plugin: \n\\#00C7FF\\Warps Enabled", 1)
+	elseif enable_warps == true then
+		djui_popup_create("Only Up 64 Plugin: \n\\#A02200\\Warps Disabled", 1)
+	end
+	enable_warps = not enable_warps
+    return true
+end
+
 function HeightToggle(msg)
 	if enable_character_height == false then
-		djui_popup_create("Only Up 64 Plugin: \n\\#00C7FF\\Showing Y position", 1)
+		djui_popup_create("Only Up 64 Plugin: \n\\#00C7FF\\Y Position Enabled", 1)
 	elseif enable_character_height == true then
-		djui_popup_create("Only Up 64 Plugin: \n\\#A02200\\Hiding Y position", 1)
+		djui_popup_create("Only Up 64 Plugin: \n\\#A02200\\Y Position Disabled", 1)
 	end
     enable_character_height = not enable_character_height
     return true
@@ -276,7 +317,7 @@ end
 
 function MovesetToggle(msg)
 	if enable_only_up_moveset == false then
-		djui_popup_create("Only Up 64 Plugin: \n\\#00C7FF\\Moveset Toggled", 1)
+		djui_popup_create("Only Up 64 Plugin: \n\\#00C7FF\\Moveset Enabled", 1)
 	elseif enable_only_up_moveset == true then
 		djui_popup_create("Only Up 64 Plugin: \n\\#A02200\\Moveset Disabled", 1)
 	end
@@ -293,5 +334,7 @@ hook_mario_action(ACT_KAZE_AIR_HIT_WALL, { every_frame = act_kaze_air_hit_wall }
 hook_mario_action(ACT_KAZE_DIVE_SLIDE,   { every_frame = act_kaze_dive_slide })
 hook_mario_action(ACT_WALL_SLIDE,        { every_frame = act_wall_slide, gravity = act_wall_slide_gravity })
 
+hook_chat_command("w", "warp(area, warpNode=10)", LevelWarp)
+hook_chat_command('only-up-warps', '- Toggle Only Up 64 Warps [Host Only]', WarpToggle)
 hook_chat_command('only-up-height', '- Toggle displaying character height on HUD and player list', HeightToggle)
 hook_chat_command('only-up-moveset', '- Toggle Only Up 64 Moveset', MovesetToggle)
