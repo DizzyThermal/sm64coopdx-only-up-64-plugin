@@ -15,7 +15,7 @@ ACT_WALL_SLIDE = allocate_mario_action(ACT_GROUP_AIRBORNE | ACT_FLAG_AIR | ACT_F
 ACT_KAZE_DIVE_SLIDE = allocate_mario_action(ACT_GROUP_MOVING | ACT_FLAG_MOVING | ACT_FLAG_DIVING | ACT_FLAG_ATTACKING)
 ACT_KAZE_AIR_HIT_WALL = allocate_mario_action(ACT_GROUP_AIRBORNE | ACT_FLAG_AIR)
 
-MOD_NAME = "Only Up 64 Beta 1"
+MOD_NAME = "Only Up 64 v1.0"
 function mod_active(mod_name)
     for i in pairs(gActiveMods) do
         if mod_name == gActiveMods[i].name then return true end
