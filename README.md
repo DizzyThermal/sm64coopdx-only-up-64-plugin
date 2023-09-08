@@ -6,7 +6,7 @@
 
 ### Toggle Height (Y-Coordinate) on HUD / Player list:
 
-* `/only-up-height` - Toggle displaying character height on HUD and player list.
+> `/only-up-height` - Toggle displaying character height on HUD and player list.
 
 ![y-coordinate](./resources/y-coordinate.gif)
 
@@ -35,27 +35,35 @@
 
 ![ground-pound-dive](./resources/ground-pound-dive.gif)
 
-### Warp System (from Alpha Testing)
+### Warp System (Disabled by Default)
 
-`/w <area #>`
+* To **enable the warp system**, the *host* must type:
+    > `/only-up-warps`
 
-* Areas 1 - 7 can be warped to
+* Using the warp system (Areas 1-8 and Warp Nodes 10-11 can be used):
+    > `/w [AREA=1-8] [WARP_NODE=10-11]`
 
 #### Examples
 
-* `/w 1` - Warp to Bottom of Area 1
-* `/w 1 11` - Warp to Top of Area 1
-* `/w 7 11` - Warp to Top of Area 7 (Smoke Stacks)
-* `/w 7 13` - Warp to Top of Area 7 (Mario)
+> `/w 1` - Warp to Bottom of Area 1 (Start)
+
+> `/w 1 11` - Warp to Top of Area 1 (Stars)
+
+> `/w 8` - Warp to Bottom of Area 8 (Smoke Stacks)
+
+> `/w 8 11` - Warp to Top of Area 8 (Mario)
 
 ## Chat Commands
 
-* `/only-up-height` - Toggle displaying character height on HUD and player list
-* `/only-up-moveset` - Toggle Only Up 64 Moveset
-* `/only-up-warps` - Toggle Only Up 64 Warps [Host Only]
+> `/only-up-height` - Toggle displaying character height on HUD and player list
+
+> `/only-up-moveset` - Toggle Only Up 64 Moveset
+
+> `/only-up-warps` - Toggle Only Up 64 Warps [Host Only]
 
 ## Changes
 
+* Added Area 8 and made the plugin compatible with all versions of Only Up 64
 * Added Debug Warp system from Only Up 64 Alpha testing to Only Up 64 Plugin (Default Off)
 * Being able to change directions when ground pound diving
 * Using the triple jump action for the ground pound jump (removed original ground pound jump)
