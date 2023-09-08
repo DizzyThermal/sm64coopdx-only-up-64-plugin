@@ -4,21 +4,22 @@
 
 local enable_character_height = true
 local enable_only_up_moveset = true
+local enable_warps = false
 
 local twirling = false
 local twirl_counter = 0
 local twirl_count = 10
-local animation_counter = 0
+local mapPad = 16390
 
 -- Actions
 ACT_WALL_SLIDE = allocate_mario_action(ACT_GROUP_AIRBORNE | ACT_FLAG_AIR | ACT_FLAG_MOVING | ACT_FLAG_ALLOW_VERTICAL_WIND_ACTION)
 ACT_KAZE_DIVE_SLIDE = allocate_mario_action(ACT_GROUP_MOVING | ACT_FLAG_MOVING | ACT_FLAG_DIVING | ACT_FLAG_ATTACKING)
 ACT_KAZE_AIR_HIT_WALL = allocate_mario_action(ACT_GROUP_AIRBORNE | ACT_FLAG_AIR)
 
-MOD_NAME = "Only Up 64 v1.0"
+MOD_NAME = "Only Up 64 v"
 function mod_active(mod_name)
     for i in pairs(gActiveMods) do
-        if mod_name == gActiveMods[i].name then return true end
+        if string.find(gActiveMods[i].name, mod_name) then return true end
     end
 
     return false
@@ -43,17 +44,15 @@ function print_character_height()
     yPad = 58
     xNegativePad = 16
     yNegativePad = 3
-    mapPad = 16390
-    wallX = 7700
 
     -- Calculate Character Height
+    areaIndex = m.area.index - 1
+    if areaIndex < 0 then
+        areaIndex = 7
+    end
+    characterHeight = math.floor(m.pos.y)
     if mod_active(MOD_NAME) then
-        if m.area.index == 7 and m.pos.x > wallX then
-            mapPad = mapPad + 32000
-        end
-        characterHeight = math.floor((mapPad + (32000 * (m.area.index - 1)) + m.pos.y) / 10)
-    else
-        characterHeight = math.floor(m.pos.y)
+        characterHeight = math.floor((mapPad + (32000 * areaIndex) + m.pos.y) / 10)
     end
 
     negative = false
@@ -254,13 +253,13 @@ function frame_check()
     end
 
     -- Character Heights (Y)
+    areaIndex = m.area.index - 1
+    if areaIndex < 0 then
+        areaIndex = 7
+    end
     characterHeight = math.floor(m.pos.y)
     if mod_active(MOD_NAME) then
-        mapPad = 16390
-        if m.area.index == 7 and m.pos.x > wallX then
-            mapPad = mapPad + 32000
-        end
-        characterHeight = math.floor((mapPad + (32000 * (m.area.index - 1)) + m.pos.y) / 10)
+        characterHeight = math.floor((mapPad + (32000 * areaIndex) + m.pos.y) / 10)
     end
 
     if enable_character_height then
@@ -288,6 +287,10 @@ function LevelWarp(msg)
       warpId = tonumber(msg_parts[2])
     end
 
+    -- Correct Area 8 -> Area 0
+    if area == 8 then
+        area = 0
+    end
     warp_to_warpnode(gNetworkPlayers[0].currLevelNum, area, act, warpId)
 
     return true
@@ -334,7 +337,7 @@ hook_mario_action(ACT_KAZE_AIR_HIT_WALL, { every_frame = act_kaze_air_hit_wall }
 hook_mario_action(ACT_KAZE_DIVE_SLIDE,   { every_frame = act_kaze_dive_slide })
 hook_mario_action(ACT_WALL_SLIDE,        { every_frame = act_wall_slide, gravity = act_wall_slide_gravity })
 
-hook_chat_command("w", "warp(area, warpNode=10)", LevelWarp)
+hook_chat_command("w", "[AREA=1-8] [WARP_NODE=10-11]", LevelWarp)
 hook_chat_command('only-up-warps', '- Toggle Only Up 64 Warps [Host Only]', WarpToggle)
 hook_chat_command('only-up-height', '- Toggle displaying character height on HUD and player list', HeightToggle)
 hook_chat_command('only-up-moveset', '- Toggle Only Up 64 Moveset', MovesetToggle)
