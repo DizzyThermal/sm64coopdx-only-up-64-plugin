@@ -204,11 +204,11 @@ function mario_on_set_action(m)
         m.particleFlags = m.particleFlags | PARTICLE_SPARKLES
         return set_mario_action(m, ACT_WALL_KICK_AIR, 0)
     end
-	
-	-- Get sparkles from speed kicks.
-	if m.action == ACT_JUMP_KICK and m.forwardVel >= 40 then
+
+    -- Get sparkles from speed kicks.
+    if m.action == ACT_JUMP_KICK and m.forwardVel >= 40 then
         m.particleFlags = m.particleFlags | PARTICLE_SPARKLES
-	end
+    end
 end
 
 function mario_update(m)
@@ -237,9 +237,9 @@ function mario_update(m)
         set_mario_action(m, ACT_TRIPLE_JUMP, 0)
     end
 
-    -- Disable Fall Damage
-    m.hurtCounter = 0
-    m.health = 0x880
+    -- if m.playerIndex == 0 and m.action == ACT_WALKING then
+    --     m.faceAngle.y = m.intendedYaw
+    -- end
 end
 
 function frame_check()
@@ -252,17 +252,17 @@ function frame_check()
         set_mario_action(m, ACT_FORWARD_ROLLOUT, 0)
     end
 
-    -- Character Heights (Y)
-    areaIndex = m.area.index - 1
-    if areaIndex < 0 then
-        areaIndex = 7
-    end
-    characterHeight = math.floor(m.pos.y)
-    if mod_active(MOD_NAME) then
-        characterHeight = math.floor((mapPad + (32000 * areaIndex) + m.pos.y) / 10)
-    end
+    if enable_character_height and not mod_active("Flood")then
+        -- Character Heights (Y)
+        areaIndex = m.area.index - 1
+        if areaIndex < 0 then
+            areaIndex = 7
+        end
+        characterHeight = math.floor(m.pos.y)
+        if mod_active(MOD_NAME) then
+            characterHeight = math.floor((mapPad + (32000 * areaIndex) + m.pos.y) / 10)
+        end
 
-    if enable_character_height then
         gPlayerSyncTable[0].height = characterHeight
         for i = 0, MAX_PLAYERS - 1 do
             network_player_set_description(gNetworkPlayers[i], "Y: " ..tostring(gPlayerSyncTable[i].height), 255, 255, 255, 255)
