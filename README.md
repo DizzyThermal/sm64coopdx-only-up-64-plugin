@@ -61,8 +61,12 @@
 
 > `/only-up-warps` - Toggle Only Up 64 Warps [Host Only]
 
+> `/only-up-music` - Toggle Only Up 64 Music
+
 ## Changes
 
+* Added Flood Mod Support
+* Added Music Toggle
 * Added Area 8 and made the plugin compatible with all versions of Only Up 64
 * Added Debug Warp system from Only Up 64 Alpha testing to Only Up 64 Plugin (Default Off)
 * Being able to change directions when ground pound diving
