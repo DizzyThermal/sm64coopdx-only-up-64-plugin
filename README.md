@@ -4,9 +4,21 @@
 
 ## Features
 
+### Warp System (Disabled by Default)
+
+![warp-menu](./resources/warp-menu.gif)
+
+* To **enable the warp system**, the *host* or *moderator* must type:
+    > `/only-up-warps`
+
+* Once warps are enabled, to open the Warp Menu type:
+    > `/only-up-practice`
+
+* or use keybind: **`[X]`**
+
 ### Toggle Height (Y-Coordinate) on HUD / Player list:
 
-> `/only-up-height` - Toggle displaying character height on HUD and player list.
+> `/only-up-height` - Toggle Character height on HUD and Player List.
 
 ![y-coordinate](./resources/y-coordinate.gif)
 
@@ -35,38 +47,20 @@
 
 ![ground-pound-dive](./resources/ground-pound-dive.gif)
 
-### Warp System (Disabled by Default)
-
-* To **enable the warp system**, the *host* must type:
-    > `/only-up-warps`
-
-* Using the warp system (Areas 1-8 and Warp Nodes 10-11 can be used):
-    > `/w [AREA=1-8] [WARP_NODE=10-11]`
-
-#### Examples
-
-> `/w 1` - Warp to Bottom of Area 1 (Start)
-
-> `/w 1 11` - Warp to Top of Area 1 (Stars)
-
-> `/w 8` - Warp to Bottom of Area 8 (Smoke Stacks)
-
-> `/w 8 11` - Warp to Top of Area 8 (Mario)
-
 ## Chat Commands
 
-> `/only-up-height` - Toggle displaying character height on HUD and player list
+> `/only-up-height` - Toggle Character height on HUD and Player List
 
 > `/only-up-moveset` - Toggle Only Up 64 Moveset
 
-> `/only-up-warps` - Toggle Only Up 64 Warps [Host Only]
+> `/only-up-warps` - Toggle Warps [Mod Only]
 
-> `/only-up-music` - Toggle Only Up 64 Music
+> `/only-up-practice` - **[X]** Warp Menu (Must be Enabled)
 
 ## Changes
 
+* Added Warp Menu for Practice
 * Added Flood Mod Support
-* Added Music Toggle
 * Added Area 8 and made the plugin compatible with all versions of Only Up 64
 * Added Debug Warp system from Only Up 64 Alpha testing to Only Up 64 Plugin (Default Off)
 * Being able to change directions when ground pound diving
