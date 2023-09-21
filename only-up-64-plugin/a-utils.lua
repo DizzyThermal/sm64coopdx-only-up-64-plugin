@@ -145,7 +145,7 @@ function render_practice_menu()
 end
 
 function check_menu_input(m)
-    if not OU_ACTIVE then return end
+    if not OU_ACTIVE or OU_FLOOD_ACTIVE then return end
 
     if not is_game_paused() and IN_PRACTICE_MENU then
         if m.controller.stickY > 60 and RETURNED_NEUTRAL then
