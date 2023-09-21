@@ -1,35 +1,17 @@
--- name: Only Up 64 Plugin
+-- name: Only Up 64 Plugin v1.7
 -- author: DizzyThermal and steven3004
--- description: Only Up 64 Plugin\n\nAdds the following features:\n\n  > Character height visible on the HUD (Y) and Playerlist\n  > Only Up 64 Moveset\n  > Warps (Disabled by Default)
+-- description: Only Up 64 Plugin\n\nAdds the following features:\n\n  > Character height visible on the HUD (Y) and Playerlist\n  > Only Up 64 Moveset\n  > Warp Menu (Disabled by Default)
 
-local enable_character_height = true
-local enable_only_up_moveset = true
-local enable_warps = false
+-- Active Mods
+OU_ACTIVE = mod_active("Only Up 64 v")
+OU_FLOOD_ACTIVE = mod_active("Only Up 64 Flood")
 
-local twirling = false
-local twirl_counter = 0
-local twirl_count = 10
-local mapPad = 16390
-
--- Actions
-ACT_WALL_SLIDE = allocate_mario_action(ACT_GROUP_AIRBORNE | ACT_FLAG_AIR | ACT_FLAG_MOVING | ACT_FLAG_ALLOW_VERTICAL_WIND_ACTION)
-ACT_KAZE_DIVE_SLIDE = allocate_mario_action(ACT_GROUP_MOVING | ACT_FLAG_MOVING | ACT_FLAG_DIVING | ACT_FLAG_ATTACKING)
-ACT_KAZE_AIR_HIT_WALL = allocate_mario_action(ACT_GROUP_AIRBORNE | ACT_FLAG_AIR)
-
-MOD_NAME = "Only Up 64 v"
-function mod_active(mod_name)
-    for i in pairs(gActiveMods) do
-        if string.find(gActiveMods[i].name, mod_name) then return true end
-    end
-
-    return false
-end
-
-function print_character_height()
+-- Render Character Height / Menu
+hook_event(HOOK_ON_HUD_RENDER, function()
     m = gMarioStates[0]
 
     -- Do not show if in the following CUTSCENEs
-    if (not enable_character_height
+    if (not ENABLE_CHARACTER_HEIGHT
       or m.action == ACT_END_PEACH_CUTSCENE
       or m.action == ACT_CREDITS_CUTSCENE
       or m.action == ACT_END_WAVING_CUTSCENE
@@ -46,13 +28,17 @@ function print_character_height()
     yNegativePad = 3
 
     -- Calculate Character Height
-    areaIndex = m.area.index - 1
-    if areaIndex < 0 then
-        areaIndex = 7
-    end
     characterHeight = math.floor(m.pos.y)
-    if mod_active(MOD_NAME) then
-        characterHeight = math.floor((mapPad + (32000 * areaIndex) + m.pos.y) / 10)
+    if OU_FLOOD_ACTIVE and m.health < 0xFF then
+        characterHeight = get_highest_player_height()
+    end
+
+    if OU_ACTIVE then
+        areaIndex = m.area.index - 1
+        if areaIndex < 0 then
+            areaIndex = 7
+        end
+        characterHeight = math.floor((MAP_PAD + (32000 * areaIndex) + characterHeight) / 10)
     end
 
     negative = false
@@ -71,126 +57,55 @@ function print_character_height()
         djui_hud_set_color(246, 190, 0, 255)
         djui_hud_render_texture(get_texture_info("minus"), (screenWidth - xPad - textLength + xNegativePad), (screenHeight - yPad + yNegativePad), (scale * 1.3), (scale * 1.3))
     end
-end
 
--------------------------------------
---            Wall Slide           --
--- from: mods/extended-moveset.lua --
--------------------------------------
-function act_wall_slide(m)
-    if not enable_only_up_moveset then return end
-    
-    if (m.input & INPUT_A_PRESSED) ~= 0 then
-        m.vel.y = 52.0
-        -- m.faceAngle.y = limit_angle(m.faceAngle.y + 0x8000)
-        return set_mario_action(m, ACT_WALL_KICK_AIR, 0)
-    end
+    -- Render Practice Menu
+    if IN_PRACTICE_MENU then render_practice_menu() end
+end)
 
-    -- attempt to stick to the wall a bit. if it's 0, sometimes you'll get kicked off of slightly sloped walls
-    mario_set_forward_vel(m, -1.0)
+-- Mario Update Hook --
+hook_event(HOOK_MARIO_UPDATE, function(m)
+    if not ENABLE_ONLY_UP_MOVESET then return end
 
-    m.particleFlags = m.particleFlags | PARTICLE_DUST
+    if m.playerIndex ~= 0 then return end
 
-    play_sound(SOUND_MOVING_TERRAIN_SLIDE + m.terrainSoundAddend, m.marioObj.header.gfx.cameraToObject)
-    set_mario_animation(m, MARIO_ANIM_START_WALLKICK)
-
-    if perform_air_step(m, 0) == AIR_STEP_LANDED then
-        mario_set_forward_vel(m, 0.0)
-        if check_fall_damage_or_get_stuck(m, ACT_HARD_BACKWARD_GROUND_KB) == 0 then
-            return set_mario_action(m, ACT_FREEFALL_LAND, 0)
+    -- Ground Pound Dive Out (From: mods/extended-moveset.lua)
+    if m.action == ACT_GROUND_POUND and (m.input & INPUT_B_PRESSED) ~= 0 then
+        if (m.input & INPUT_NONZERO_ANALOG) ~= 0 then
+            m.faceAngle.y = m.intendedYaw
         end
+        mario_set_forward_vel(m, 10.0)
+        m.vel.y = 35.0
+        set_mario_action(m, ACT_DIVE, 0)
     end
 
-    m.actionTimer = m.actionTimer + 1
-    if m.wall == nil and m.actionTimer > 2 then
-        mario_set_forward_vel(m, 0.0)
-        return set_mario_action(m, ACT_FREEFALL, 0)
+    -- Ground Pound Twirl
+    if m.action == ACT_GROUND_POUND and (m.input & INPUT_A_PRESSED) ~= 0 then
+        TWIRLING = true
+        TWIRL_COUNTER = 0
+        m.vel.y = 40.0
+        set_mario_action(m, ACT_TWIRLING, 0)
     end
 
-    return 0
-end
-
-function act_wall_slide_gravity(m)
-    if not enable_only_up_moveset then return end
-
-    m.vel.y = m.vel.y - 2
-
-    if m.vel.y < -30 then
-        m.vel.y = -30
-    end
-end
-
-function limit_angle(a)
-    return (a + 0x8000) % 0x10000 - 0x8000
-end
-
-function act_kaze_air_hit_wall(m)
-
-    if m.heldObj ~= 0 then
-        mario_drop_held_object(m)
+    -- Ground Pound Jump (From: mods/extended-moveset.lua)
+    if m.action == ACT_GROUND_POUND_LAND and (m.input & INPUT_A_PRESSED) ~= 0 then
+        set_mario_action(m, ACT_TRIPLE_JUMP, 0)
     end
 
-    m.actionTimer = m.actionTimer + 1
-    if m.actionTimer <= 1 and (m.input & INPUT_A_PRESSED) ~= 0 then
-        m.vel.y = 52.0
-        m.faceAngle.y = limit_angle(m.faceAngle.y + 0x8000)
-        m.particleFlags = m.particleFlags | PARTICLE_SPARKLES
-        return set_mario_action(m, ACT_WALL_KICK_AIR, 0)
-    else
-        m.faceAngle.y = limit_angle(m.faceAngle.y + 0x8000)
-        return set_mario_action(m, ACT_WALL_SLIDE, 0)
+    -- Instant Turn
+    if m.action == ACT_WALKING
+      and analog_stick_held_back(m) ~= 0
+      and m.forwardVel > 0
+      and m.forwardVel < 16
+      and m.input & INPUT_NONZERO_ANALOG ~= 0 then
+        m.faceAngle.y = m.intendedYaw
+        --set_mario_action(m, ACT_FINISH_TURNING_AROUND, 0)
+        print("Setting action")
     end
+end)
 
-    --! Missing return statement (in original C code). The returned value is the result of the call
-    -- to set_mario_animation. In practice, this value is nonzero.
-    -- This results in this action "cancelling" into itself. It is supposed to
-    -- execute three times, each on a separate frame, but instead it executes
-    -- three times on the same frame.
-    -- This results in firsties only being possible for a single frame, instead
-    -- of three.
-    return set_mario_animation(m, MARIO_ANIM_START_WALLKICK)
-end
-
-function act_kaze_dive_slide(m)
-    if (m.input & INPUT_ABOVE_SLIDE) == 0 and ((m.input & INPUT_A_PRESSED) ~= 0 or (m.input & INPUT_B_PRESSED) ~= 0) then
-        queue_rumble_data_mario(m, 5, 80)
-		if m.actionTimer <= 0 then
-			m.particleFlags = m.particleFlags | PARTICLE_SPARKLES
-		end
-        if m.forwardVel > 0 then
-            return set_mario_action(m, ACT_FORWARD_ROLLOUT, 0)
-        else
-            return set_mario_action(m, ACT_BACKWARD_ROLLOUT, 0)
-        end
-    end
-
-    play_mario_landing_sound_once(m, SOUND_ACTION_TERRAIN_BODY_HIT_GROUND)
-
-    --! If the dive slide ends on the same frame that we pick up on object,
-    -- Mario will not be in the dive slide action for the call to
-    -- mario_check_object_grab, and so will end up in the regular picking action,
-    -- rather than the picking up after dive action.
-
-    if update_sliding(m, 8.0) ~= 0 and is_anim_at_end(m) ~= 0 then
-        mario_set_forward_vel(m, 0.0)
-        set_mario_action(m, ACT_STOMACH_SLIDE_STOP, 0)
-    end
-
-    if mario_check_object_grab(m) ~= 0 then
-        mario_grab_used_object(m)
-        if m.heldObj ~= 0 then
-            m.marioBodyState.grabPos = GRAB_POS_LIGHT_OBJ
-        end
-        return true
-    end
-
-    common_slide_action(m, ACT_STOMACH_SLIDE_STOP, ACT_FREEFALL, MARIO_ANIM_DIVE)
-	m.actionTimer = m.actionTimer + 1
-    return false
-end
-
-function mario_on_set_action(m)
-    if not enable_only_up_moveset then return end
+-- On Set Mario Action Hook --
+hook_event(HOOK_ON_SET_MARIO_ACTION, function(m)
+    if not ENABLE_ONLY_UP_MOVESET then return end
 
     if m.action == ACT_WALL_SLIDE then
         m.vel.y = 0.0
@@ -205,62 +120,32 @@ function mario_on_set_action(m)
         return set_mario_action(m, ACT_WALL_KICK_AIR, 0)
     end
 
-    -- Get sparkles from speed kicks.
+    -- Get Sparkles from Speed Kicks.
     if m.action == ACT_JUMP_KICK and m.forwardVel >= 40 then
         m.particleFlags = m.particleFlags | PARTICLE_SPARKLES
     end
-end
+end)
 
-function mario_update(m)
-    if not enable_only_up_moveset then return end
-
-    -- Ground Pound Dive Out (From: mods/extended-moveset.lua)
-    if m.action == ACT_GROUND_POUND and (m.input & INPUT_B_PRESSED) ~= 0 then
-        if (m.input & INPUT_NONZERO_ANALOG) ~= 0 then
-            m.faceAngle.y = m.intendedYaw
-        end
-        mario_set_forward_vel(m, 10.0)
-        m.vel.y = 35.0
-        set_mario_action(m, ACT_DIVE, 0)
-    end
-
-    -- Ground Pound Twirl
-    if m.action == ACT_GROUND_POUND and (m.input & INPUT_A_PRESSED) ~= 0 then
-        twirling = true
-        twirl_counter = 0
-        m.vel.y = 40.0
-        set_mario_action(m, ACT_TWIRLING, 0)
-    end
-
-    -- Ground Pound Jump (From: mods/extended-moveset.lua)
-    if m.action == ACT_GROUND_POUND_LAND and (m.input & INPUT_A_PRESSED) ~= 0 then
-        set_mario_action(m, ACT_TRIPLE_JUMP, 0)
-    end
-
-    -- if m.playerIndex == 0 and m.action == ACT_WALKING then
-    --     m.faceAngle.y = m.intendedYaw
-    -- end
-end
-
-function frame_check()
+-- Update Hook --
+hook_event(HOOK_UPDATE, function()
     local m = gMarioStates[0]
 
-    twirl_counter = twirl_counter + 1
-    if twirling and twirl_counter >= twirl_count then
-        twirling = false
-        twirl_counter = 0
+    TWIRL_COUNTER = TWIRL_COUNTER + 1
+    if TWIRLING and TWIRL_COUNTER >= TWIRL_COUNT then
+        TWIRLING = false
+        TWIRL_COUNTER = 0
         set_mario_action(m, ACT_FORWARD_ROLLOUT, 0)
     end
 
-    if enable_character_height and not mod_active("Flood")then
+    if ENABLE_CHARACTER_HEIGHT and not OU_FLOOD_ACTIVE then
         -- Character Heights (Y)
-        areaIndex = m.area.index - 1
-        if areaIndex < 0 then
-            areaIndex = 7
-        end
         characterHeight = math.floor(m.pos.y)
-        if mod_active(MOD_NAME) then
-            characterHeight = math.floor((mapPad + (32000 * areaIndex) + m.pos.y) / 10)
+        if OU_ACTIVE then
+            areaIndex = m.area.index - 1
+            if areaIndex < 0 then
+                areaIndex = 7
+            end
+            characterHeight = math.floor((MAP_PAD + (32000 * areaIndex) + m.pos.y) / 10)
         end
 
         gPlayerSyncTable[0].height = characterHeight
@@ -268,76 +153,84 @@ function frame_check()
             network_player_set_description(gNetworkPlayers[i], "Y: " ..tostring(gPlayerSyncTable[i].height), 255, 255, 255, 255)
         end
     end
-end
 
-function LevelWarp(msg)
-	if not enable_warps then return end
+    -- Lock / Unlock Mario depending on Practice Menu State
+    m.freeze = IN_PRACTICE_MENU and 1 or 0
 
-    msg_parts = {}
-    for substring in msg:gmatch("%w+") do table.insert(msg_parts, substring) end
+    -- Menu Selection
+    check_menu_input(m)
+end)
 
-    area = 1
-	act = 0
-    warpId = 10
-
-    if #(msg_parts) > 0 then
-      area = tonumber(msg_parts[1])
-    end
-    if #(msg_parts) > 1 then
-      warpId = tonumber(msg_parts[2])
-    end
-
-    -- Correct Area 8 -> Area 0
-    if area == 8 then
-        area = 0
-    end
-    warp_to_warpnode(gNetworkPlayers[0].currLevelNum, area, act, warpId)
-
-    return true
-end
-
-function WarpToggle(msg)
-    if not network_is_server() then return end
-
-	if enable_warps == false then
-		djui_popup_create("Only Up 64 Plugin: \n\\#00C7FF\\Warps Enabled", 1)
-	elseif enable_warps == true then
-		djui_popup_create("Only Up 64 Plugin: \n\\#A02200\\Warps Disabled", 1)
-	end
-	enable_warps = not enable_warps
-    return true
-end
-
-function HeightToggle(msg)
-	if enable_character_height == false then
+-- Character Height --
+function HeightToggle()
+	ENABLE_CHARACTER_HEIGHT = not ENABLE_CHARACTER_HEIGHT
+    if ENABLE_CHARACTER_HEIGHT then
 		djui_popup_create("Only Up 64 Plugin: \n\\#00C7FF\\Y Position Enabled", 1)
-	elseif enable_character_height == true then
+	else
 		djui_popup_create("Only Up 64 Plugin: \n\\#A02200\\Y Position Disabled", 1)
+        for i = 0, MAX_PLAYERS - 1 do
+            network_player_set_description(gNetworkPlayers[i], "", 255, 255, 255, 255)
+        end
 	end
-    enable_character_height = not enable_character_height
     return true
 end
+hook_chat_command('only-up-height', '- Toggle Character height on HUD and Player List', HeightToggle)
 
-function MovesetToggle(msg)
-	if enable_only_up_moveset == false then
+-- Only Up 64 Moveset --
+function MovesetToggle()
+	ENABLE_ONLY_UP_MOVESET = not ENABLE_ONLY_UP_MOVESET
+    if ENABLE_ONLY_UP_MOVESET then
 		djui_popup_create("Only Up 64 Plugin: \n\\#00C7FF\\Moveset Enabled", 1)
-	elseif enable_only_up_moveset == true then
+	else
 		djui_popup_create("Only Up 64 Plugin: \n\\#A02200\\Moveset Disabled", 1)
 	end
-	enable_only_up_moveset = not enable_only_up_moveset
     return true
 end
-
-hook_event(HOOK_ON_HUD_RENDER, print_character_height)
-hook_event(HOOK_MARIO_UPDATE, mario_update)
-hook_event(HOOK_ON_SET_MARIO_ACTION, mario_on_set_action)
-hook_event(HOOK_UPDATE, frame_check)
-
-hook_mario_action(ACT_KAZE_AIR_HIT_WALL, { every_frame = act_kaze_air_hit_wall })
-hook_mario_action(ACT_KAZE_DIVE_SLIDE,   { every_frame = act_kaze_dive_slide })
-hook_mario_action(ACT_WALL_SLIDE,        { every_frame = act_wall_slide, gravity = act_wall_slide_gravity })
-
-hook_chat_command("w", "[AREA=1-8] [WARP_NODE=10-11]", LevelWarp)
-hook_chat_command('only-up-warps', '- Toggle Only Up 64 Warps [Host Only]', WarpToggle)
-hook_chat_command('only-up-height', '- Toggle displaying character height on HUD and player list', HeightToggle)
 hook_chat_command('only-up-moveset', '- Toggle Only Up 64 Moveset', MovesetToggle)
+
+-- Warp Menu for Practice --
+function PracticeMenu()
+    if not gGlobalSyncTable.enable_warps then
+        djui_popup_create("Only Up 64 Plugin: \n\\#A02200\\Warps Not Enabled!", 1)
+        return true
+    end
+
+    IN_PRACTICE_MENU = true
+    PRACTICE_MENU[1].text = "Last Warp" .. last_warp_string()
+    return true
+end
+function WarpToggle()
+    gGlobalSyncTable.enable_warps = not gGlobalSyncTable.enable_warps
+    if gGlobalSyncTable.enable_warps then
+        djui_popup_create("Only Up 64 Plugin: \n\\#00C7FF\\Warps Enabled", 1)
+    else
+        djui_popup_create("Only Up 64 Plugin: \n\\#A02200\\Warps Disabled", 1)
+    end
+    return true
+end
+if OU_ACTIVE and not OU_FLOOD_ACTIVE then
+    function PracticeMenu()
+        if not gGlobalSyncTable.enable_warps then
+            djui_popup_create("Only Up 64 Plugin: \n\\#A02200\\Warps Not Enabled!", 1)
+            return true
+        end
+
+        IN_PRACTICE_MENU = true
+        PRACTICE_MENU[1].text = "Last Warp" .. last_warp_string()
+        return true
+    end
+    hook_chat_command("only-up-practice", "- [X] Warp Menu (Must be Enabled)", PracticeMenu)
+
+    if network_is_server() or network_is_moderator() then
+        hook_chat_command('only-up-warps', '- Toggle Warps [Mod Only]', WarpToggle)
+    end
+end
+hook_event(HOOK_ON_WARP, function() WARPED = true end)
+
+-- Mario Action Hooks
+---@diagnostic disable-next-line: missing-parameter, param-type-mismatch
+hook_mario_action(ACT_KAZE_AIR_HIT_WALL, { every_frame = act_kaze_air_hit_wall })
+---@diagnostic disable-next-line: missing-parameter, param-type-mismatch
+hook_mario_action(ACT_KAZE_DIVE_SLIDE, { every_frame = act_kaze_dive_slide })
+---@diagnostic disable-next-line: missing-parameter, param-type-mismatch
+hook_mario_action(ACT_WALL_SLIDE, { every_frame = act_wall_slide, gravity = act_wall_slide_gravity })
