@@ -217,6 +217,7 @@ if OU_ACTIVE and not OU_FLOOD_ACTIVE then
 
         IN_PRACTICE_MENU = true
         PRACTICE_MENU[1].text = "Last Warp" .. last_warp_string()
+        play_sound(SOUND_MENU_PAUSE, gMarioStates[0].marioObj.header.gfx.cameraToObject)
         return true
     end
     hook_chat_command("only-up-practice", "- [X] Warp Menu (Must be Enabled)", PracticeMenu)

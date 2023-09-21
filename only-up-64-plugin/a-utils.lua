@@ -151,9 +151,11 @@ function check_menu_input(m)
         if m.controller.stickY > 60 and RETURNED_NEUTRAL then
             RETURNED_NEUTRAL = false
             MENU_SELECTION_INDEX = MENU_SELECTION_INDEX - 1
+            play_sound(SOUND_MENU_CHANGE_SELECT, gMarioStates[0].marioObj.header.gfx.cameraToObject)
         elseif m.controller.stickY < -60 and RETURNED_NEUTRAL then
             RETURNED_NEUTRAL = false
             MENU_SELECTION_INDEX = MENU_SELECTION_INDEX + 1
+            play_sound(SOUND_MENU_CHANGE_SELECT, gMarioStates[0].marioObj.header.gfx.cameraToObject)
         elseif (m.controller.buttonPressed & A_BUTTON) ~= 0 then
             local menu_size = get_menu_size()
             local selectionIndex = MENU_SELECTION_INDEX % menu_size
@@ -163,6 +165,7 @@ function check_menu_input(m)
                 -- Main Menu
                 if selectionIndex == (menu_size - 1) then
                     -- Exit
+                    play_sound(SOUND_MENU_PAUSE, gMarioStates[0].marioObj.header.gfx.cameraToObject)
                     close_menu()
                 elseif selectionIndex == 0 then
                     -- Last Warp
@@ -176,6 +179,7 @@ function check_menu_input(m)
                     -- Enter Submenu
                     MENU_INDEX = selectionIndex
                     MENU_SELECTION_INDEX = 0
+                    play_sound(SOUND_MENU_PAUSE, gMarioStates[0].marioObj.header.gfx.cameraToObject)
                 end
             else
                 -- Sub Menu
@@ -183,6 +187,7 @@ function check_menu_input(m)
                     -- Go Back
                     MENU_INDEX = 0
                     MENU_SELECTION_INDEX = 0
+                    play_sound(SOUND_MENU_PAUSE, gMarioStates[0].marioObj.header.gfx.cameraToObject)
                 else
                     -- Last Warp
                     warp_from_menu()
@@ -191,6 +196,9 @@ function check_menu_input(m)
             end
         elseif (m.controller.buttonPressed & B_BUTTON) ~= 0 then
             if MENU_INDEX == 0 then
+                MENU_INDEX = 0
+                MENU_SELECTION_INDEX = 0
+                play_sound(SOUND_MENU_PAUSE, gMarioStates[0].marioObj.header.gfx.cameraToObject)
                 close_menu()
             else
                 MENU_INDEX = 0
