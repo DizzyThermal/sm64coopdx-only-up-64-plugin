@@ -1,4 +1,4 @@
--- name: Only Up 64 Plugin v1.7
+-- name: Only Up 64 Plugin v1.7.1
 -- author: DizzyThermal and steven3004
 -- description: Only Up 64 Plugin\n\nAdds the following features:\n\n  > Character height visible on the HUD (Y) and Playerlist\n  > Only Up 64 Moveset\n  > Warp Menu (Disabled by Default)
 
@@ -66,8 +66,6 @@ end)
 hook_event(HOOK_MARIO_UPDATE, function(m)
     if not ENABLE_ONLY_UP_MOVESET then return end
 
-    if m.playerIndex ~= 0 then return end
-
     -- Ground Pound Dive Out (From: mods/extended-moveset.lua)
     if m.action == ACT_GROUND_POUND and (m.input & INPUT_B_PRESSED) ~= 0 then
         if (m.input & INPUT_NONZERO_ANALOG) ~= 0 then
@@ -98,8 +96,6 @@ hook_event(HOOK_MARIO_UPDATE, function(m)
       and m.forwardVel < 16
       and m.input & INPUT_NONZERO_ANALOG ~= 0 then
         m.faceAngle.y = m.intendedYaw
-        --set_mario_action(m, ACT_FINISH_TURNING_AROUND, 0)
-        print("Setting action")
     end
 end)
 
