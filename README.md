@@ -1,6 +1,6 @@
-# Only Up 64 Plugin (sm64ex-coop)
+# Only Up 64 Plugin (sm64coopdx)
 
-* Note: This is NOT the [Only Up 64 Map](https://github.com/DizzyThermal/sm64ex-coop-only-up-64)
+* Note: This is NOT the [Only Up 64 Map](https://github.com/DizzyThermal/sm64coopdx-only-up-64)
 
 ## Features
 
@@ -81,5 +81,5 @@
 
 * Ground Pound Jump, Ground Pound Dive, and Wallslide are from `mods/extended-moveset.lua` with some modifications
 * Moveset contributors: @steven3004
-* sm64ex-coop technical help: @cooliokid956, @andre8739
+* sm64coopdx technical help: @cooliokid956, @andre8739
 * Testing help: @retrodarkgamerx, @cooliokid956
