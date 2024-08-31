@@ -1,4 +1,4 @@
--- name: Only Up 64 Plugin v1.7.1
+-- name: Only Up 64 Plugin v1.7.2
 -- author: DizzyThermal and steven3004
 -- description: Only Up 64 Plugin\n\nAdds the following features:\n\n  > Character height visible on the HUD (Y) and Playerlist\n  > Only Up 64 Moveset\n  > Warp Menu (Disabled by Default)
 
