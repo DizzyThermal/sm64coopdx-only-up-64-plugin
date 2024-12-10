@@ -81,6 +81,7 @@ hook_event(HOOK_MARIO_UPDATE, function(m)
         TWIRLING = true
         TWIRL_COUNTER = 0
         m.vel.y = 40.0
+	m.angleVel.y = 4500
         set_mario_action(m, ACT_TWIRLING, 0)
     end
 
@@ -130,6 +131,7 @@ hook_event(HOOK_UPDATE, function()
     if TWIRLING and TWIRL_COUNTER >= TWIRL_COUNT then
         TWIRLING = false
         TWIRL_COUNTER = 0
+	m.angleVel.y = 0
         set_mario_action(m, ACT_FORWARD_ROLLOUT, 0)
     end
 
