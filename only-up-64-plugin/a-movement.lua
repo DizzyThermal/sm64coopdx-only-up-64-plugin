@@ -3,7 +3,7 @@
 -- from: mods/extended-moveset.lua --
 -------------------------------------
 function act_wall_slide(m)
-    if not ENABLE_ONLY_UP_MOVESET then return end
+    if not _G.ou64_enable_moveset then return end
 
     if (m.input & INPUT_A_PRESSED) ~= 0 then
         m.vel.y = 52.0
@@ -36,7 +36,7 @@ function act_wall_slide(m)
 end
 
 function act_wall_slide_gravity(m)
-    if not ENABLE_ONLY_UP_MOVESET then return end
+    if not _G.ou64_enable_moveset then return end
 
     m.vel.y = m.vel.y - 2
 

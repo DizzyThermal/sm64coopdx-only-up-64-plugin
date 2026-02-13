@@ -1,64 +1,78 @@
 # Only Up 64 Plugin (sm64coopdx)
 
-* Note: This is NOT the [Only Up 64 Map](https://github.com/DizzyThermal/sm64coopdx-only-up-64)
+> [!NOTE]
+> This is NOT the [Only Up 64 Map](https://github.com/DizzyThermal/sm64coopdx-only-up-64)
 
-## Features
+## Plugin Features
 
 ### Warp System (Disabled by Default)
 
 ![warp-menu](./resources/warp-menu.gif)
 
-* To **enable the warp system**, the *host* or *moderator* must type:
-    > `/only-up-warps`
+> [!NOTE]
+> To **enable the warp system**, the *host* or *moderator* must type: `/ou64-warps`
 
-* Once warps are enabled, to open the Warp Menu type:
-    > `/only-up-practice`
 
-* or use keybind: **`[X]`**
+> [!TIP]
+> With warps enabled, type: `/ou64-practice` or use keybind: **`[X]`**
 
 ### Toggle Height (Y-Coordinate) on HUD / Player list:
 
-> `/only-up-height` - Toggle Character height on HUD and Player List.
+> `/ou64-height` - Toggles Character height on HUD and Player List.
 
 ![y-coordinate](./resources/y-coordinate.gif)
 
-### Wallslide
-#### _(Modified from: mods/extended-moveset.lua)_
-
-* _Allows wallslide from long jump_
-
-![wallslide](./resources/wallslide.gif)
-
-### Ground Pound Twirl (Z, A)
+### Ground Pound Twirl (A, Z, A)
 
 * _Rollout after twirl is to not allow consecutive ground pound twirls_
 
 ![ground-pound-twirl](./resources/ground-pound-twirl.gif)
 
-### Ground Pound Jump (Z, A on ground)
-#### _(Modified from: mods/extended-moveset.lua)_
+### Ground Pound Jump (A, Z, A on ground)
 
 * _Triple front flip animation instead of jump twirl_
 
 ![ground-pound-jump](./resources/ground-pound-jump.gif)
 
-### Ground Pound Dive (Z, B)
-#### _(From: mods/extended-moveset.lua)_
+### Ground Pound Dive (A, Z, B)
 
 ![ground-pound-dive](./resources/ground-pound-dive.gif)
 
+### Wallslide
+
+* _Allows wallslide from long jump_
+
+![wallslide](./resources/wallslide.gif)
+
+### Instant-Turn
+
+* _Allows for the player to make 180-degree turns when moving slow enough_
+
 ## Chat Commands
 
-> `/only-up-height` - Toggle Character height on HUD and Player List
+> `/ou64-height` - Toggles Character height on HUD and Player List
 
-> `/only-up-moveset` - Toggle Only Up 64 Moveset
+> `/ou64-meter` - Toggles Height Meter
 
-> `/only-up-warps` - Toggle Warps [Mod Only]
+> `/ou64-moveset` - Toggles Only Up 64 Moveset
 
-> `/only-up-practice` - **[X]** Warp Menu (Must be Enabled)
+> `/ou64-checkpoints` - Toggles Checkpointing [Mod Only]
+
+> `/ou64-warps` - Toggles Warps [Mod Only]
+
+> `/ou64-practice` - Shows Warp Menu (Must be Enabled)
+
+> `/ou64-run-timer` - Toggles Run Timer
+
+> `/ou64-leaderboard` - Toggles Leaderboard
 
 ## Changes
 
+* Added Leaderboard and Run Timer
+* Added / Refactored Chat Commands
+* Added Checkpoints - modified to work in different areas (thanks djoslin0!)
+* Added exportable server metrics
+* Refactored a lot of the code
 * Added Warp Menu for Practice
 * Added Flood Mod Support
 * Added Area 8 and made the plugin compatible with all versions of Only Up 64
@@ -81,5 +95,7 @@
 
 * Ground Pound Jump, Ground Pound Dive, and Wallslide are from `mods/extended-moveset.lua` with some modifications
 * Moveset contributors: @steven3004
+* Checkpoints: @djoslin0
+* Recolored player heads: @EmilyEmmi
 * sm64coopdx technical help: @cooliokid956, @andre8739
-* Testing help: @retrodarkgamerx, @cooliokid956
+* Testing help: @retrodarkgamerx, @cooliokid956, @colbyrayz.z64
