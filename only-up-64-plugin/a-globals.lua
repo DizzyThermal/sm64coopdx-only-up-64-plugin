@@ -99,6 +99,9 @@ _G.ou64_metrics_heartbeat_interval_frames = 300     -- 10 seconds (300 frames @ 
 _G.ou64_metrics_player_list_last_time = 0
 _G.ou64_metrics_player_list_interval_frames = 300   -- 10 seconds (300 frames @ 30 fps)
 
+-- State Variables
+_G.ou64_plugin_debug = false
+
 -- Warps
 _G.ou64_warp_level = _G.ou64_level_id
 _G.ou64_warp_area = 1

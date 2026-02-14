@@ -1,5 +1,5 @@
 -- name: \\#FAFF20\\Only Up \\#E01F2D\\Plugin
--- description: \\#FAFF20\\Only Up 64 Plugin\\#FFF\\ v2.0.0\nBy \\#E01F2D\\DizzyThermal\\#FFF\\\n\nAdds the following features:\n > Only Up 64 Moveset\n > Heights (HUD and Playerlist)\n > Checkpoints\n > Leaderboards\n > Warp Menu (Disabled by Default)\n > Exportable Metrics\n\nSpecial thanks to \\#0868EC\\steven3004\\#FFF\\ for movement fixes and sparkle particles\nSpecial thanks to \\#4E6D29\\djoslin0\\#FFF\\ for checkpoints - modified to work with multiple areas\nSpecial thanks to \\#EEA7B0\\EmilyEmmi\\#FFF\\ for recolorable player heads in height meter
+-- description: \\#FAFF20\\Only Up 64 Plugin\\#FFF\\ v2.0.1\nBy \\#E01F2D\\DizzyThermal\\#FFF\\\n\nAdds the following features:\n > Only Up 64 Moveset\n > Heights (HUD and Playerlist)\n > Checkpoints\n > Leaderboards\n > Warp Menu (Disabled by Default)\n > Exportable Metrics\n\nSpecial thanks to \\#0868EC\\steven3004\\#FFF\\ for movement fixes and sparkle particles\nSpecial thanks to \\#4E6D29\\djoslin0\\#FFF\\ for checkpoints - modified to work with multiple areas\nSpecial thanks to \\#EEA7B0\\EmilyEmmi\\#FFF\\ for recolorable player heads in height meter
 
 local math_floor,string_format = math.floor,string.format
 
@@ -201,45 +201,7 @@ hook_event(HOOK_MARIO_UPDATE, function(m)
         djui_chat_message_create("WARPING")
         warp_to_level(_G.ou64_end_level_id, 1, _G.ou64_act_id)
     end
-
-    -- Export Spectator Camera Settings
-    --if gPlayerSyncTable[0].run_time > 0 then
-    --    network_send(true, {
-    --        packet_id = _G.ou64_packet_ids.spectator_camera_settings,
-    --        player_index = network_global_index_from_local(0),
-    --        posX = gLakituState.pos.x,
-    --        posY = gLakituState.pos.y,
-    --        posZ = gLakituState.pos.z,
-    --        focusX = gLakituState.focus.x,
-    --        focusY = gLakituState.focus.y,
-    --        focusZ = gLakituState.focus.z,
-    --        yaw = gLakituState.yaw,
-    --        posHSpeed = gLakituState.posHSpeed,
-    --        posVSpeed = gLakituState.posVSpeed,
-    --        focHSpeed = gLakituState.focHSpeed,
-    --        focVSpeed = gLakituState.focVSpeed,
-    --    })
-    --end
-
-    -- DEBUG (SERVER ONLY)
-    if bind_debug(m) and
-            network_is_server() then
-        debug()
-    end
 end)
-
-function debug()
-    -- Print OU64 ID
-    djui_chat_message_create(string_format("%s", get_ou64_id()))
-
-    -- Print Location
-    local m = gMarioStates[0]
-    local mpos = m.pos
-    djui_chat_message_create(string.format("%s, %s, %s", mpos.x, mpos.y, mpos.z))
-
-    -- Warp to Ending
-    --warp_to_warpnode(_G.ou64_level_id, 0, _G.ou64_act_id, 0x11)
-end
 
 function teleport()
     m = gMarioStates[0]

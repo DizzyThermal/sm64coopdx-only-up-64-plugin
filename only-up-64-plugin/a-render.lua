@@ -396,3 +396,28 @@ function render_run_timer()
         y_offset = y_offset + 32
     end
 end
+
+function debug_render_debug_info()
+    if _G.ou64_plugin_debug then
+        djui_hud_set_resolution(RESOLUTION_DJUI)
+
+        local debug_box_width = 500
+        local debug_box_height = 400
+
+        local anchor_x = djui_hud_get_screen_width() - debug_box_width - 64
+        local anchor_y = djui_hud_get_screen_height() - debug_box_height - 64
+        local x_pad = 32
+        local y_pad = 64
+
+        djui_hud_set_adjusted_color(0, 0, 0, 200)
+        djui_hud_render_rect(anchor_x, anchor_y, debug_box_width, debug_box_height)
+
+        djui_hud_set_font(FONT_MENU)
+        djui_hud_set_adjusted_color(250, 255, 32, 255)
+        djui_hud_print_text("Debug Info", anchor_x - 8, anchor_y - 20, _G.ou64_run_timer_scale / 1.5)
+
+        djui_hud_set_font(FONT_ALIASED)
+        djui_hud_set_adjusted_color(255, 255, 255, 255)
+        djui_hud_print_text("Objects:", anchor_x + x_pad - 16, anchor_y + y_pad - 32, 1)
+    end
+end
