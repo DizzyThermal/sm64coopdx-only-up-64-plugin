@@ -1,6 +1,8 @@
 --- @class ByteWriter
 
-local string_pack,string_sub,string_unpack,table_insert = string.pack,string.sub,string.unpack,table.insert
+-- Localize for performance.
+local string_pack,string_sub,string_unpack,table_insert =
+      string.pack,string.sub,string.unpack,table.insert
 
 local ByteWriter = {}
 ByteWriter.__index = ByteWriter
@@ -15,7 +17,7 @@ function ByteWriter:new()
     return self
 end
 
---- Class Functions ---
+-- Class Functions
 function ByteWriter:clear()
     if not self.buffer then return end
     for i = #self.buffer, 1, -1 do
@@ -34,7 +36,7 @@ function ByteWriter:is_empty()
     return #self.buffer == 0
 end
 
---- Data Functions ---
+-- Data Functions
 function ByteWriter:bool(value)
     table_insert(self.buffer, string_pack("<B", ((value and 1) or 0)))
 end

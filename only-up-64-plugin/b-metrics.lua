@@ -1,22 +1,24 @@
-local string_format = string.format
+-- Localize for performance.
+local string_format =
+      string.format
 
-function export_start_time()
+local function export_start_time()
     local modFs = mod_fs_get() or mod_fs_create()
     local ou64_metrics_start_time_file = modFs:get_file("ou64-metrics-start-time")
     if ou64_metrics_start_time_file == nil then
         ou64_metrics_start_time_file = modFs:create_file("ou64-metrics-start-time", true)
     end
     if ou64_metrics_start_time_file == nil then return end
-    
-    _G.ou64_metrics_start_time = get_time()
+
+    ou64_metrics_start_time = get_time()
     ou64_metrics_start_time_file:set_text_mode(false)
     ou64_metrics_start_time_file:rewind()
-    ou64_metrics_start_time_file:write_integer(_G.ou64_metrics_start_time, INT_TYPE_U32)
+    ou64_metrics_start_time_file:write_integer(ou64_metrics_start_time, INT_TYPE_U32)
 
     modFs:save()
 end
 
-function export_heartbeat()
+local function export_heartbeat()
     local modFs = mod_fs_get() or mod_fs_create()
     local ou64_metrics_heartbeat_file = modFs:get_file("ou64-metrics-heartbeat")
     if ou64_metrics_heartbeat_file == nil then
@@ -30,10 +32,10 @@ function export_heartbeat()
 
     modFs:save()
 
-    _G.ou64_metrics_heartbeat_last_time = get_global_timer()
+    ou64_metrics_heartbeat_last_time = get_global_timer()
 end
 
-function export_player_count(player_count)
+local function export_player_count(player_count)
     local modFs = mod_fs_get() or mod_fs_create()
     local ou64_metrics_player_count_file = modFs:get_file("ou64-metrics-player-count")
     if ou64_metrics_player_count_file == nil then
@@ -45,11 +47,11 @@ function export_player_count(player_count)
     ou64_metrics_player_count_file:rewind()
     ou64_metrics_player_count_file:write_integer(player_count, INT_TYPE_U8)
 
-    _G.ou64_metrics_player_count_last_player_count = player_count
+    ou64_metrics_player_count_last_player_count = player_count
     modFs:save()
 end
 
-function export_player_list()
+local function export_player_list()
     local modFs = mod_fs_get() or mod_fs_create()
     local ou64_metrics_player_list_file = modFs:get_file("ou64-metrics-player-list")
     if ou64_metrics_player_list_file == nil then
@@ -105,5 +107,35 @@ function export_player_list()
 
     modFs:save()
 
-    _G.ou64_metrics_player_list_last_time = get_global_timer()
+    ou64_metrics_player_list_last_time = get_global_timer()
 end
+
+-- Metric Hooks
+hook_event(HOOK_UPDATE, function()
+    if ou64_metrics_export_metrics and
+            network_is_server() then
+        if ou64_metrics_start_time == 0 then
+            export_start_time()
+        end
+        if (get_global_timer() - ou64_metrics_heartbeat_last_time) >= ou64_metrics_heartbeat_interval_frames then
+            export_heartbeat()
+        end
+        if (get_global_timer() - ou64_metrics_player_list_last_time) >= ou64_metrics_player_list_interval_frames then
+            export_player_list()
+        end
+    end
+end)
+
+-- Player Connects (Update Player Count)
+hook_event(HOOK_ON_PLAYER_CONNECTED, function()
+    if network_is_server() then
+        export_player_count(network_player_connected_count())
+    end
+end)
+
+-- Player Disconnects (Update Player Count)
+hook_event(HOOK_ON_PLAYER_DISCONNECTED, function()
+    if network_is_server() then
+        export_player_count(network_player_connected_count())
+    end
+end)

@@ -1,36 +1,18 @@
 local ByteWriter = require('a-bytewriter')
 
-local math_floor,math_max,math_min,math_random,math_randomseed,string_format,string_gmatch,string_gsub = math.floor,math.max,math.min,math.random,math.randomseed,string.format,string.gmatch,string.gsub
+local math_random,math_randomseed,string_format,string_gsub,string_match,string_sub =
+      math.random,math.randomseed,string.format,string.gsub,string.match,string.sub
 
 math_randomseed(get_time())
 
-function if_then_else(cond, if_true, if_false)
-    if cond then return if_true end
-    return if_false
-end
-
-function djui_hud_set_adjusted_color(r, g, b, a)
-    local multiplier = 1
-    if is_game_paused() then multiplier = 0.5 end
-    djui_hud_set_color(r * multiplier, g * multiplier, b * multiplier, a)
-end
-
-function get_highest_player_height()
-    -- For Flood Support
-    local highest_height = -0x8000
-    for i = 0, MAX_PLAYERS - 1 do
-        if gNetworkPlayers[i].connected and gMarioStates[i].pos.y > highest_height then
-            highest_height = gMarioStates[i].pos.y
-        end
-    end
-
-    return highest_height
-end
-
+-- Limits the provided angle
+--- @param a integer
 function limit_angle(a)
     return (a + 0x8000) % 0x10000 - 0x8000
 end
 
+-- Returns the name without backslash escapes.
+--- @param name string
 function string_without_hex(name)
     local s = ''
     local inSlash = false
@@ -45,219 +27,14 @@ function string_without_hex(name)
     return s
 end
 
--- Menu Functions --
-function close_menu()
-    _G.ou64_practice_menu_index = 0
-    _G.ou64_practice_menu_selection_index = 0
-    _G.ou64_practice_menu_returned_neutral = true
-    _G.ou64_practice_menu_open = false
-end
-
-function get_menu_size()
-    local menuSize = 0
-
-    for i, entry in ipairs(_G.ou64_practice_menu) do
-        if entry.menu_index == _G.ou64_practice_menu_index then
-            menuSize = menuSize + 1
-        end
-    end
-
-    return menuSize + 1
-end
-
-function get_menu_item()
-    for i, entry in ipairs(_G.ou64_practice_menu) do
-        wLevel = entry.level
-        wArea = entry.area
-        wAct = entry.act
-        wNode = entry.node
-
-        if wLevel == _G.ou64_warp_level
-            and wArea == _G.ou64_warp_area
-            and wAct == _G.ou64_warp_act
-            and wNode == _G.ou64_warp_node then
-            return entry
-        end
-    end
-
-    return nil
-end
-
-function last_warp_string()
-    local lastWarpString = ""
-    local menuItem = get_menu_item()
-    if menuItem ~= nil then
-        lastWarpString = " [" .. menuItem.text .. "]"
-    end
-
-    return lastWarpString
-end
-
-function warp_from_menu()
-    local menu_size = get_menu_size()
-
-    for i, entry in ipairs(_G.ou64_practice_menu) do
-        if entry.menu_index == _G.ou64_practice_menu_index and
-                entry.menu_selection_index == _G.ou64_practice_menu_selection_index % menu_size then
-            _G.ou64_warp_level = entry.level
-            _G.ou64_warp_area = entry.area
-            _G.ou64_warp_act = entry.act
-            _G.ou64_warp_node = entry.node
-
-            if _G.ou64_warp_level ~= nil and
-                    _G.ou64_warp_area ~= nil and
-                    _G.ou64_warp_act ~= nil and
-                    _G.ou64_warp_node ~= nil then
-                reset_timer()
-                reset_checkpoints()
-                warp_to_warpnode(_G.ou64_warp_level, _G.ou64_warp_area, _G.ou64_warp_act, _G.ou64_warp_node)
-            end
-        end
-    end
-end
-
-function render_practice_menu()
-    djui_hud_set_font(FONT_NORMAL)
-    djui_hud_set_resolution(RESOLUTION_DJUI)
-
-    local menu_size = get_menu_size()
-
-    -- Menu Items
-    local menuTexts = {}
-    local selectionIndex = 0
-    for i, entry in ipairs(_G.ou64_practice_menu) do
-        local menu_index = entry.menu_index
-        if menu_index == _G.ou64_practice_menu_index then
-            table.insert(menuTexts, entry.text)
-            selectionIndex = _G.ou64_practice_menu_selection_index % menu_size
-        end
-    end
-
-    -- Back/Exit
-    backText = "Back"
-    if _G.ou64_practice_menu_index == 0 then
-        backText = "Exit"
-    end
-
-    local scale = 1
-    local width = 400
-    local x = (djui_hud_get_screen_width() - width) * 0.5
-
-    local y = _G.ou64_practice_menu_item_height * 2
-    local backOffset = menu_size + 1
-    local height = _G.ou64_practice_menu_item_height * backOffset
-
-    local anchor_x = x - 10
-    local anchor_y = y
-
-
-    djui_hud_set_adjusted_color(0, 0, 0, 180)
-    djui_hud_render_rect(x - 12, y, width + 24, y + height)
-    djui_hud_set_adjusted_color(255, 255, 255, 255)
-
-    djui_hud_set_font(FONT_MENU) 
-    djui_hud_set_adjusted_color(1, 147, 105, 255)
-    djui_hud_print_text("Practice Menu", anchor_x - 8, anchor_y - 24, _G.ou64_run_timer_scale / 1.5)
-
-    djui_hud_set_font(FONT_ALIASED)
-    djui_hud_set_adjusted_color(255, 255, 255, 255)
-    -- Print Menu Items
-    for i, entry in ipairs(menuTexts) do
-        djui_hud_print_text(entry, x + 20, y + (_G.ou64_practice_menu_item_height * i), scale)
-    end
-    -- Print Back/Exit
-    djui_hud_print_text(backText, x + 20, y + (_G.ou64_practice_menu_item_height * backOffset), scale)
-
-    -- Draw Selector
-    local backPad = 0
-    if selectionIndex >= menu_size - 1 then
-        backPad = _G.ou64_practice_menu_item_height
-    end
-    djui_hud_print_text(">", x, y + (_G.ou64_practice_menu_item_height * (selectionIndex + 1)) + backPad, scale)
-end
-
-function check_menu_input(m)
-    if not _G.ou64_active or _G.ou64_flood_active then return end
-
-    if not is_game_paused() and _G.ou64_practice_menu_open then
-        if m.controller.stickY > 60 and _G.ou64_practice_menu_returned_neutral then
-            _G.ou64_practice_menu_returned_neutral = false
-            _G.ou64_practice_menu_selection_index = _G.ou64_practice_menu_selection_index - 1
-            play_sound(SOUND_MENU_CHANGE_SELECT, gMarioStates[0].marioObj.header.gfx.cameraToObject)
-        elseif m.controller.stickY < -60 and _G.ou64_practice_menu_returned_neutral then
-            _G.ou64_practice_menu_returned_neutral = false
-            _G.ou64_practice_menu_selection_index = _G.ou64_practice_menu_selection_index + 1
-            play_sound(SOUND_MENU_CHANGE_SELECT, gMarioStates[0].marioObj.header.gfx.cameraToObject)
-        elseif (m.controller.buttonPressed & A_BUTTON) ~= 0 then
-            local menu_size = get_menu_size()
-            local selectionIndex = _G.ou64_practice_menu_selection_index % menu_size
-
-            if _G.ou64_practice_menu_index == 0 then
-                -- Main Menu
-                if selectionIndex == (menu_size - 1) then
-                    -- Exit
-                    play_sound(SOUND_MENU_PAUSE, gMarioStates[0].marioObj.header.gfx.cameraToObject)
-                    close_menu()
-                elseif selectionIndex == 0 then
-                    -- Last Warp
-                    if _G.ou64_warped then
-                        if _G.ou64_warp_level ~= nil and _G.ou64_warp_area ~= nil and _G.ou64_warp_act ~= nil and _G.ou64_warp_node ~= nil then
-                            reset_timer()
-                            reset_checkpoints()
-                            warp_to_warpnode(_G.ou64_warp_level, _G.ou64_warp_area, _G.ou64_warp_act, _G.ou64_warp_node)
-                        end
-                    end
-                    close_menu()
-                else
-                    -- Enter Submenu
-                    _G.ou64_practice_menu_index = selectionIndex
-                    _G.ou64_practice_menu_selection_index = 0
-                    play_sound(SOUND_MENU_PAUSE, gMarioStates[0].marioObj.header.gfx.cameraToObject)
-                end
-            else
-                -- Sub Menu
-                if selectionIndex == (menu_size - 1) then
-                    -- Go Back
-                    _G.ou64_practice_menu_index = 0
-                    _G.ou64_practice_menu_selection_index = 0
-                    play_sound(SOUND_MENU_PAUSE, gMarioStates[0].marioObj.header.gfx.cameraToObject)
-                else
-                    -- Last Warp
-                    warp_from_menu()
-                    close_menu()
-                end
-            end
-        elseif (m.controller.buttonPressed & B_BUTTON) ~= 0 then
-            if _G.ou64_practice_menu_index == 0 then
-                _G.ou64_practice_menu_index = 0
-                _G.ou64_practice_menu_selection_index = 0
-                play_sound(SOUND_MENU_PAUSE, gMarioStates[0].marioObj.header.gfx.cameraToObject)
-                close_menu()
-            else
-                _G.ou64_practice_menu_index = 0
-                _G.ou64_practice_menu_selection_index = 0
-            end
-        end
-    elseif not is_game_paused() then
-        if (m.controller.buttonPressed & X_BUTTON) ~= 0 then
-            if not _G.ou64_practice_menu_open then
-                PracticeMenu()
-            else
-                close_menu()
-            end
-        end
-    end
-    if _G.ou64_practice_menu_open
-      and m.controller.stickY > -60
-      and m.controller.stickY < 60 then
-        _G.ou64_practice_menu_returned_neutral = true
-    end
-end
-
+-- Returns a packed integer from the provided color table.
+--- @param color table
 function pack_color_int(color)
     return color.r << 24 | color.g << 16 | color.b << 8 | 0xFF
 end
 
+-- Returns an unpacked color table from the provided color integer.
+--- @param color_int integer
 function unpack_color_int(color_int)
     local r = (color_int >> 24) & 0xFF
     local g = (color_int >> 16) & 0xFF
@@ -270,99 +47,6 @@ function unpack_color_int(color_int)
         b = b,
         a = a,
     }
-end
-
--- Timer Functions
-function standing_on_start_timer(m)
-    if m.playerIndex ~= 0 then
-       return false
-    end
-
-    return m.area.index == 1 and
-        m.pos.x > 5000 and m.pos.x < 6300 and
-        m.pos.y > -16270 and m.pos.y < -15000 and
-        m.pos.z > -6300 and m.pos.z < -4900
-end
-
-function standing_on_end_timer(m)
-    if m.playerIndex ~= 0 then
-       return false
-    end
-
-    return m.area.index == 0 and
-        m.pos.x > -2200 and m.pos.x < -1900 and
-        m.pos.y > 13250 and
-        m.pos.z > -1400 and m.pos.z < -1000
-end
-
-function time_string_to_msec(time_string)
-    local time_parts = {}
-    for part in string_gmatch(time_string, "([^:]+)") do
-        table.insert(time_parts, part)
-    end
-
-    local hours, minutes, seconds_millis
-    if #time_parts == 3 then
-        -- HH:MM:SS.ms
-        hours = tonumber(time_parts[1])
-        minutes = tonumber(time_parts[2])
-        seconds_millis = time_parts[3]
-    elseif #time_parts == 2 then
-        -- MM:SS.ms
-        hours = 0
-        minutes = tonumber(time_parts[1])
-        seconds_millis = time_parts[2]
-    else
-        -- Invalid Format
-        return nil
-    end
-
-    local second_parts = {}
-    for part in string_gmatch(seconds_millis, "([^%.]+)") do
-        table.insert(second_parts, part)
-    end
-
-    local seconds = tonumber(second_parts[1])
-    local millis = tonumber(second_parts[2])
-
-    return (hours * 3600000) + (minutes * 60000) + (seconds * 1000) + millis
-end
-
-function delta_to_sec(delta)
-    return math_floor(delta / 30)
-end
-
-function delta_to_msec(delta)
-    return math_floor(delta / 30 * 1000)
-end
-
-function format_msec(total_msec)
-    local total_seconds = math_floor(total_msec / 1000)
-    local millis = total_msec % 1000
-    local seconds = total_seconds % 60
-    local total_minutes = math_floor(total_seconds / 60)
-    local minutes = total_minutes % 60
-    local hours = math_floor(total_minutes / 60)
-
-    if hours > 0 then
-        return string_format("%d:%02d:%02d.%02d", hours, minutes, seconds, millis)
-    else
-        return string_format("%02d:%02d.%02d", minutes, seconds, millis)
-    end
-end
-
-function format_time(delta)
-    local total_seconds = delta / 30
-
-    local hours = math_floor(total_seconds / 3600)
-    local minutes = math_floor((total_seconds % 3600) / 60)
-    local seconds = math_floor(total_seconds % 60)
-    local millis = math_floor((total_seconds % 1) * 100)
-    if hours > 0 then
-        return string_format("%d:%02d:%02d.%02d", hours, minutes, seconds, millis)
-    else
-        return string_format("%02d:%02d.%02d", minutes, seconds, millis)
-    end
 end
 
 -- Leaderboard Functions
@@ -414,16 +98,16 @@ function add_to_leaderboard(
         player_uuid,
         coopnet_id,
         player_name)
-    local run_id = -1
+    local run_id = 0
     if network_is_server() then
         -- Create ModFS and OU64 Leaderboard File Descriptor
         local modFs = mod_fs_get() or mod_fs_create()
         local ou64_leaderboard_file = modFs:get_file("ou64-leaderboard") or modFs:create_file("ou64-leaderboard", true)
         if ou64_leaderboard_file ~= nil then
             -- Determine Next Run ID
-            if _G.ou64_leaderboard ~= nil and
-                    #_G.ou64_leaderboard > 0 then
-                for key, entry in pairs(_G.ou64_leaderboard) do
+            if ou64_leaderboard ~= nil and
+                    #ou64_leaderboard > 0 then
+                for key, entry in pairs(ou64_leaderboard) do
                     if entry.run_id >= run_id then
                         run_id = entry.run_id + 1
                     end
@@ -448,9 +132,14 @@ function add_to_leaderboard(
         end
     end
 
+    -- Initialize Leaderboard (if necessary)
+    if ou64_leaderboard == nil then
+        ou64_leaderboard = {}
+    end
+
     -- Insert into Leaderboard and Sort Leaderboard
     table.insert(
-        _G.ou64_leaderboard,
+        ou64_leaderboard,
         {
             run_id = run_id,
             timestamp_sec = timestamp_sec,
@@ -465,7 +154,100 @@ function add_to_leaderboard(
             player_name = player_name
         }
     )
-    table.sort(_G.ou64_leaderboard, function(e1, e2)
+    table.sort(ou64_leaderboard, function(e1, e2)
+        if e1.run_time_msec == e2.run_time_msec then
+            return e1.run_id < e2.run_id
+        else
+            return e1.run_time_msec < e2.run_time_msec
+        end
+    end)
+end
+
+function add_to_flood_leaderboard(
+        timestamp_sec,
+        run_time_msec,
+        player_model,
+        player_hair,
+        player_skin,
+        player_cap,
+        flood_area,
+        flood_hardmode,
+        flood_speed,
+        player_uuid,
+        coopnet_id,
+        player_name)
+    local run_id = 0
+    if network_is_server() then
+        -- Create ModFS and OU64 Leaderboard File Descriptor
+        local leaderboard_file_name = string.format("ou64-leaderboard-flood-%s", flood_area)
+        local modFs = mod_fs_get() or mod_fs_create()
+        local ou64_leaderboard_file = modFs:get_file(leaderboard_file_name) or modFs:create_file(leaderboard_file_name, true)
+        if ou64_leaderboard_file ~= nil then
+            -- Determine Next Run ID
+            if ou64_flood_leaderboard ~= nil and
+                    ou64_flood_leaderboard[flood_area] ~= nil and
+                    #ou64_flood_leaderboard[flood_area] > 0 then
+                for key, entry in pairs(ou64_flood_leaderboard[flood_area]) do
+                    if entry.run_id >= run_id then
+                        run_id = entry.run_id + 1
+                    end
+                end
+            end
+
+            -- Append Run to Leaderboard
+            ou64_leaderboard_file:set_text_mode(false)
+            ou64_leaderboard_file:seek(0, FILE_SEEK_END)
+            ou64_leaderboard_file:write_integer(run_id, INT_TYPE_U32)
+            ou64_leaderboard_file:write_integer(timestamp_sec, INT_TYPE_U32)
+            ou64_leaderboard_file:write_integer(run_time_msec, INT_TYPE_U32)
+            ou64_leaderboard_file:write_integer(player_model, INT_TYPE_U8)
+            ou64_leaderboard_file:write_integer(player_hair, INT_TYPE_U32)
+            ou64_leaderboard_file:write_integer(player_skin, INT_TYPE_U32)
+            ou64_leaderboard_file:write_integer(player_cap, INT_TYPE_U32)
+            ou64_leaderboard_file:write_integer(flood_area, INT_TYPE_U8)
+            ou64_leaderboard_file:write_integer(flood_hardmode, INT_TYPE_U8)
+            ou64_leaderboard_file:write_number(flood_speed, FLOAT_TYPE_F32)
+            ou64_leaderboard_file:write_string(player_uuid)
+            ou64_leaderboard_file:write_string(coopnet_id)
+            ou64_leaderboard_file:write_string(player_name)
+            modFs:save()
+        end
+    end
+
+    -- Insert into Leaderboard and Sort Leaderboard
+    if ou64_flood_leaderboard == nil then
+        ou64_flood_leaderboard = {
+            [1] = {},
+            [2] = {},
+            [3] = {},
+            [4] = {},
+            [5] = {},
+            [6] = {},
+            [7] = {},
+            [0] = {},
+        }
+    elseif ou64_flood_leaderboard[flood_area] == nil then
+        ou64_flood_leaderboard[flood_area] = {}
+    end
+    table.insert(
+        ou64_flood_leaderboard[flood_area],
+        {
+            run_id = run_id,
+            timestamp_sec = timestamp_sec,
+            run_time_msec = run_time_msec,
+            player_model = player_model,
+            player_hair = player_hair,
+            player_skin = player_skin,
+            player_cap = player_cap,
+            flood_area = flood_area,
+            flood_hardmode = flood_hardmode,
+            flood_speed = flood_speed,
+            player_uuid = player_uuid,
+            coopnet_id = coopnet_id,
+            player_name = player_name
+        }
+    )
+    table.sort(ou64_flood_leaderboard[flood_area], function(e1, e2)
         if e1.run_time_msec == e2.run_time_msec then
             return e1.run_id < e2.run_id
         else
@@ -476,11 +258,11 @@ end
 
 function request_leaderboard()
 	if network_is_server() then
-        _G.ou64_leaderboard = get_leaderboard()
-    elseif not _G.ou64_leaderboard_requesting then
-        _G.ou64_leaderboard_requesting = true
+        ou64_leaderboard = get_leaderboard(true)
+    elseif not ou64_leaderboard_requesting then
+        ou64_leaderboard_requesting = true
         local packet = ByteWriter:new()
-        packet:u8(_G.ou64_packet_ids.get_leaderboard)
+        packet:u8(ou64_packet_ids.get_leaderboard)
         packet:u8(gNetworkPlayers[0].globalIndex)
         network_send_bytestring_to(
             network_player_from_global_index(0).localIndex,
@@ -490,7 +272,23 @@ function request_leaderboard()
     end
 end
 
-function get_leaderboard()
+function request_flood_leaderboard()
+    if network_is_server() then
+        ou64_flood_leaderboard = get_flood_leaderboard()
+    elseif not ou64_leaderboard_requesting then
+        ou64_flood_leaderboard_requesting = true
+        local packet = ByteWriter:new()
+        packet:u8(ou64_packet_ids.get_flood_leaderboard)
+        packet:u8(gNetworkPlayers[0].globalIndex)
+        network_send_bytestring_to(
+            network_player_from_global_index(0).localIndex,
+            true,
+            packet:serialize()
+        )
+    end
+end
+
+function get_leaderboard(unique_only)
     local leaderboard = {}
 
     -- Create ModFS and OU64 Leaderboard File Descriptor
@@ -539,23 +337,133 @@ function get_leaderboard()
         end
     end)
 
+    if leaderboard ~= nil and
+            #leaderboard > 0 and
+            unique_only ~= nil and
+            unique_only then
+        local uuid_indices = {}
+        for i, entry in ipairs(leaderboard) do
+            local player_uuid = entry.player_uuid
+            if not uuid_indices[player_uuid] then
+                uuid_indices[player_uuid] = i
+            end
+        end
+        for i = #leaderboard, 1, -1 do
+            local entry = leaderboard[i]
+            local player_uuid = entry.player_uuid
+            if uuid_indices[player_uuid] ~= i then
+                table.remove(leaderboard, i)
+            end
+        end
+    end
+
+    return leaderboard
+end
+
+function get_flood_leaderboard()
+    local leaderboard = {
+        [1] = {},
+        [2] = {},
+        [3] = {},
+        [4] = {},
+        [5] = {},
+        [6] = {},
+        [7] = {},
+        [0] = {},
+    }
+
+    for i, entry in ipairs({1, 2, 3, 4, 5, 6, 7, 0}) do
+        -- Create ModFS and OU64 Leaderboard File Descriptor
+        local modFs = mod_fs_get() or mod_fs_create()
+        local leaderboard_file_name = string.format("ou64-leaderboard-flood-%s", entry)
+        local ou64_leaderboard_file = modFs:get_file(leaderboard_file_name)
+        if ou64_leaderboard_file ~= nil then
+            ou64_leaderboard_file:set_text_mode(false)
+            ou64_leaderboard_file:rewind()
+            while not ou64_leaderboard_file:is_eof() do
+                local run_id = ou64_leaderboard_file:read_integer(INT_TYPE_U32)
+                local timestamp_sec = ou64_leaderboard_file:read_integer(INT_TYPE_U32)
+                local run_time_msec = ou64_leaderboard_file:read_integer(INT_TYPE_U32)
+                local player_model = ou64_leaderboard_file:read_integer(INT_TYPE_U8)
+                local player_hair = ou64_leaderboard_file:read_integer(INT_TYPE_U32)
+                local player_skin = ou64_leaderboard_file:read_integer(INT_TYPE_U32)
+                local player_cap = ou64_leaderboard_file:read_integer(INT_TYPE_U32)
+                local flood_area = ou64_leaderboard_file:read_integer(INT_TYPE_U8)
+                local flood_hardmode = ou64_leaderboard_file:read_integer(INT_TYPE_U8)
+                local flood_speed = ou64_leaderboard_file:read_number(FLOAT_TYPE_F32)
+                local player_uuid = ou64_leaderboard_file:read_string()
+                local coopnet_id = ou64_leaderboard_file:read_string()
+                local player_name = ou64_leaderboard_file:read_string()
+                table.insert(
+                    leaderboard[entry],
+                    {
+                        run_id = run_id,
+                        timestamp_sec = timestamp_sec,
+                        run_time_msec = run_time_msec,
+                        player_model = player_model,
+                        player_hair = player_hair,
+                        player_skin = player_skin,
+                        player_cap = player_cap,
+                        flood_area = flood_area,
+                        flood_hardmode = flood_hardmode,
+                        flood_speed = flood_speed,
+                        player_uuid = player_uuid,
+                        coopnet_id = coopnet_id,
+                        player_name = player_name
+                    }
+                )
+            end
+
+            table.sort(leaderboard[entry], function(e1, e2)
+                if e1.run_time_msec == e2.run_time_msec then
+                    return e1.run_id < e2.run_id
+                else
+                    return e1.run_time_msec < e2.run_time_msec
+                end
+            end)
+        end
+    end
+
     return leaderboard
 end
 
 function clear_leaderboard()
-    if _G.ou64_leaderboard ~= nil then
-        for i = #_G.ou64_leaderboard, 1, -1 do
-            _G.ou64_leaderboard[i] = nil
+    if ou64_leaderboard ~= nil then
+        for i = #ou64_leaderboard, 1, -1 do
+            ou64_leaderboard[i] = nil
         end
     else
-        _G.ou64_leaderboard = {}
+        ou64_leaderboard = {}
+    end
+end
+
+function clear_flood_leaderboard()
+    if ou64_flood_leaderboard ~= nil then
+        for i, entry in ipairs({1, 2, 3, 4, 5, 6, 7, 0}) do
+            if ou64_flood_leaderboard[entry] ~= nil then
+                for j = #ou64_flood_leaderboard[entry], 1, -1 do
+                    ou64_flood_leaderboard[entry][j] = nil
+                end
+            end
+        end
+    else
+        ou64_flood_leaderboard = {
+            [1] = {},
+            [2] = {},
+            [3] = {},
+            [4] = {},
+            [5] = {},
+            [6] = {},
+            [7] = {},
+            [0] = {},
+        }
     end
 end
 
 function is_best_time(player_uuid, run_time_msec)
     local is_best = true
     local player_in_board = false
-    for i, entry in ipairs(_G.ou64_leaderboard) do
+    for i, entry in ipairs(ou64_leaderboard) do
         if player_uuid == entry.player_uuid then
             player_in_board = true
             if run_time_msec > entry.run_time_msec then
@@ -569,4 +477,120 @@ function is_best_time(player_uuid, run_time_msec)
     end
 
     return is_best
+end
+
+function is_best_flood_time(flood_area, hardmode, player_uuid, run_time_msec)
+    local is_best = true
+    local player_in_board = false
+    if ou64_flood_leaderboard ~= nil and
+            ou64_flood_leaderboard[flood_area] ~= nil and
+            #ou64_flood_leaderboard[flood_area] > 0 then
+        for i, entry in ipairs(ou64_flood_leaderboard[flood_area]) do
+            if entry.hardmode == hardmode and
+                    player_uuid == entry.player_uuid then
+                player_in_board = true
+                if run_time_msec > entry.run_time_msec then
+                    is_best = false
+                end
+            end
+        end
+    end
+
+    if not player_in_board then
+        is_best = true
+    end
+
+    return is_best
+end
+
+-- Cancels Inputs for the Provided MarioState.
+--- @param m MarioState - the MarioState to cancel inputs against.
+--- @param inputs number - the input flags to cancel (i.e., (L_TRIG | R_TRIG))
+function cancel_inputs(m, inputs)
+    m.controller.buttonPressed = m.controller.buttonPressed & ~inputs
+    m.controller.buttonDown = m.controller.buttonDown & ~inputs
+end
+
+-- Injects hex colors into the player's name, defaulting to their cap color.
+--- @param player_name string - the player's name to colorize.
+--- @param player_index integer - the player's local index (for cap color lookup).
+function get_colored_name(player_name, player_index)
+    local colored_name = player_name
+    local stripped_name = string_without_hex(player_name)
+    if player_name == stripped_name then
+        -- No color in name, add cap color as player name's color
+        local cap_color = network_player_get_override_palette_color(gNetworkPlayers[player_index], CAP)
+        if cap_color ~= nil then
+            local cap_r = 127 + cap_color.r // 2
+            local cap_g = 127 + cap_color.g // 2
+            local cap_b = 127 + cap_color.b // 2
+            colored_name = "\\#" .. string_format("%02x", cap_r) .. string_format("%02x", cap_g) .. string_format("%02x", cap_b) .. "\\" .. colored_name
+        end
+    end
+
+    return colored_name
+end
+
+-- Prints text with hex-encoded color (i.e., \\#FF0000\\Ma\\#DD0000\\ri\\#BB0000\\o)
+--- @param text string
+--- @param x integer
+--- @param y integer
+--- @param scale number
+--- @param limit integer
+function djui_hud_print_colored_text(text, x, y, scale, limit)
+    local total_space = 0
+
+    local escaping = false
+    local char_idx = 1
+    local characters_rendered = 0
+    local string_length = #(string_without_hex(text))
+    while char_idx <= #text do
+        local c = string_sub(text, char_idx, char_idx)
+        if c == "\\" then
+            if not escaping then
+                local char_pointer = char_idx + 1
+                while char_pointer < #text and
+                        string_sub(text, char_pointer, char_pointer) ~= "\\" do
+                    char_pointer = char_pointer + 1
+                end
+                local substring = string_sub(text, char_idx + 1, char_pointer - 1)
+                local hex_match = (string_match(substring, "^#?%x%x%x$") or string_match(substring, "^#?%x%x%x%x%x%x$"))
+                if hex_match ~= nil then
+                    local r = #hex_match == 7 and string_sub(hex_match, 2, 3) or string_sub(hex_match, 2, 2)
+                    local g = #hex_match == 7 and string_sub(hex_match, 4, 5) or string_sub(hex_match, 3, 3)
+                    local b = #hex_match == 7 and string_sub(hex_match, 6, 7) or string_sub(hex_match, 4, 4)
+                    if #r == 1 then
+                        r = r .. r
+                        g = g .. g
+                        b = b .. b
+                    end
+                    djui_hud_set_color(
+                        tonumber(r, 16),
+                        tonumber(g, 16),
+                        tonumber(b, 16),
+                        255
+                    )
+                else
+                    escaping = true
+                end
+                char_idx = char_pointer + 1
+            elseif escaping then
+                escaping = false
+            end
+        else
+            djui_hud_print_text(c, (x + total_space) * scale, y, scale)
+            total_space = total_space + djui_hud_measure_text(c)
+            characters_rendered = characters_rendered + 1
+            if limit ~= nil and
+                    string_length > limit and
+                    characters_rendered >= limit - 3 then
+                djui_hud_print_text("...", (x + total_space) * scale, y, scale)
+                djui_hud_set_color(255, 255, 255, 255)
+                return
+            end
+        char_idx = char_idx + 1
+        end
+    end
+
+    djui_hud_set_color(255, 255, 255, 255)
 end

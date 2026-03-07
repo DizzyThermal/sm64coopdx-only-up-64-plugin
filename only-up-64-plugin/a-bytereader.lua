@@ -1,6 +1,8 @@
 --- @class ByteReader
 
-local string_sub,string_unpack = string.sub,string.unpack
+-- Localize for performance.
+local string_sub,string_unpack =
+      string.sub,string.unpack
 
 local ByteReader = {}
 ByteReader.__index = ByteReader
@@ -14,7 +16,7 @@ function ByteReader:new(bytestring)
     return setmetatable(self, ByteReader)
 end
 
---- Class Functions ---
+-- Class Functions
 local function deserialize(self, fmt)
     local v; v, self.offset = string_unpack(fmt, self.data, self.offset)
     return v
@@ -24,7 +26,7 @@ function ByteReader:at_end()
     return self.offset >= #self.data
 end
 
---- Data Functions ---
+-- Data Functions
 function ByteReader:bool() return self:u8() ~= 0           end  ---@return boolean
 function ByteReader:u8()   return deserialize(self, "<B")  end  ---@return integer
 function ByteReader:s8()   return deserialize(self, "<b")  end  ---@return integer
