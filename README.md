@@ -107,14 +107,16 @@
 
 ![leaderboard](./resources/leaderboard.png)
 
-> [!NOTE] View the official leaderboards online at [Dizzy's Abyss](https://dizzysabyss.com))
+> [!NOTE]
+> View the official leaderboards online at [Dizzy's Abyss](https://dizzysabyss.com))
 
 > [!TIP]
 > Use the D-PAD to page through the entire leaderboard
 
 ![run-timer](./resources/run-timer.gif)
 
-> [!NOTE] Run timer tracks run time and checkpoints used and resets if the practice menu is used. 
+> [!NOTE]
+> Run timer tracks run time and checkpoints used and resets if the practice menu is used. 
 
 > [!TIP]
 > Toggle leaderboard and run timer in the settings menu (**`[L]`**` + `**`[R]`**)
