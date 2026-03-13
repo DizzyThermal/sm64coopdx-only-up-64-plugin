@@ -43,12 +43,16 @@
 > [!TIP]
 > Toggle Only Up 64 moveset in the settings menu (**`[L]`**` + `**`[R]`**)
 
+---
+
 #### Ground Pound Twirl (A, Z, A)
 
 ![ground-pound-twirl](./resources/ground-pound-twirl.gif)
 
 > [!NOTE]
 > The rollout after twirl is to not allow consecutive ground pound twirls
+
+---
 
 #### Ground Pound Jump (A, Z, A on ground)
 
@@ -57,9 +61,13 @@
 > [!NOTE]
 > Triple front flip animation instead of jump twirl (like original ROM hack)
 
+---
+
 #### Ground Pound Dive (A, Z, B)
 
 ![ground-pound-dive](./resources/ground-pound-dive.gif)
+
+---
 
 #### Wallslide
 
@@ -68,12 +76,16 @@
 > [!NOTE]
 > Also allows wallslide out of a long jump
 
+---
+
 #### Instant-Turn
 
 ![instant-turn](./resources/instant-turn.gif)
 
 > [!NOTE]
 > Allows the player to make 180-degree (instant) turns when moving slow enough
+
+---
 
 ### Checkpoint / Teleport System
 
@@ -88,6 +100,8 @@
 
 > [!TIP]
 > Toggle checkpoints in the settings menu (**`[L]`**` + `**`[R]`**)
+
+---
 
 ### Leaderboard and Run Timer
 
@@ -104,6 +118,8 @@
 
 > [!TIP]
 > Toggle leaderboard and run timer in the settings menu (**`[L]`**` + `**`[R]`**)
+
+---
 
 ## Changes
 
