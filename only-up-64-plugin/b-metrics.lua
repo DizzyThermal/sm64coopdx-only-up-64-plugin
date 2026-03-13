@@ -2,6 +2,14 @@
 local string_format =
       string.format
 
+-- Server Metrics
+local ou64_metrics_export_metrics = true
+local ou64_metrics_start_time = 0
+local ou64_metrics_heartbeat_last_time = 0
+local ou64_metrics_heartbeat_interval_frames = 300     -- 10 seconds (300 frames @ 30 fps)
+local ou64_metrics_player_list_last_time = 0
+local ou64_metrics_player_list_interval_frames = 300   -- 10 seconds (300 frames @ 30 fps)
+
 local function export_start_time()
     local modFs = mod_fs_get() or mod_fs_create()
     local ou64_metrics_start_time_file = modFs:get_file("ou64-metrics-start-time")

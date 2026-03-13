@@ -1,9 +1,31 @@
+-- Only Up 64 Settings State
+local ou64_settings_loaded = false
+
+-- Only Up 64 Settings State (Global)
+ou64_settings = {
+    enable_arcade_mode = false,
+    enable_checkpoints = true,
+    enable_moveset = true,
+    enable_music = true,
+    show_character_height = true,
+    show_height_meter = true,
+    show_leaderboard = true,
+    show_run_timer = true,
+}
+
 -- Loads Only Up 64 Plugin settings from ModFS storage.
-function load_plugin_settings()
+local function load_plugin_settings()
     -- Create ModFS File and Rewind (return if file does not exist)
     local modFs = mod_fs_get() or mod_fs_create()
     local ou64_settings_file = modFs:get_file("ou64-settings")
-    if ou64_settings_file == nil then return end
+    if ou64_settings_file == nil then
+        -- Settings File Doesn't Exist, Start Music
+        _G.ou64_api.ou64_play_music(false)
+        ou64_settings_loaded = true
+        return
+    end
+
+    -- Load Settings (File Exists)
     ou64_settings_file:set_text_mode(false)
     ou64_settings_file:rewind()
 
@@ -17,10 +39,12 @@ function load_plugin_settings()
     _G.ou64_enable_music = ou64_settings_file:is_eof() and true or (ou64_settings_file:read_integer(INT_TYPE_U8) ~= 0)
 
     -- Configure Music After Load
-    if _G.ou64_enable_music then
-        _G.ou64_api.ou64_play_music()
-    else
-        _G.ou64_api.ou64_stop_music()
+    if _G.ou64_api then
+        if _G.ou64_enable_music then
+            _G.ou64_api.ou64_play_music(false)
+        else
+            _G.ou64_api.ou64_stop_music(false)
+        end
     end
 
     ou64_settings_loaded = true
@@ -64,12 +88,13 @@ function reset_plugin_settings()
     _G.ou64_enable_music = true
 
     -- Start Music if Not Playing before reset
-    if not music_was_playing then
+    if not music_was_playing and
+            _G.ou64_api then
         _G.ou64_api.ou64_play_music()
     end
 end
 
--- Load Plugins
+-- Load Plugin Settings
 hook_event(HOOK_UPDATE, function()
     if not ou64_settings_loaded then
         load_plugin_settings()

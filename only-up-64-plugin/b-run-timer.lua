@@ -1,9 +1,22 @@
 -- Localize for performance.
-local math_floor,math_max,math_min,string_format =
-      math.floor,math.max,math.min,string.format
+local math_max,math_min,string_format =
+      math.max,math.min,string.format
 
+-- Libraries
 local ByteWriter = require('a-bytewriter')
 
+-- Run Timer Parameters
+local ou64_run_timer_scale = 1.0
+
+-- Run Timer State
+local ou64_run_timer_running = false
+local ou64_run_timer_on_start = false
+local ou64_run_timer_start_time = 0
+
+-- Run Timer State (Global)
+gPlayerSyncTable[0].run_time = 0
+
+-- Run Timer Functions
 function reset_timer()
     ou64_run_timer_running = false
     ou64_run_timer_start_time = 0
@@ -54,8 +67,13 @@ hook_event(HOOK_MARIO_UPDATE, function(m)
             local player_uuid = get_ou64_id()
             local coopnet_id = get_coopnet_id(gNetworkPlayers[0].localIndex)
             local player_name = gNetworkPlayers[0].name
-            local is_player_best_time = is_best_time(player_uuid, run_time_msec)
-            local announce_detail = is_player_best_time and "\n      \\#FAFF20\\A personal best!\\#FFFFFF\\" or ""
+            -- Announce Completed Run
+            local announce_detail = ""
+            if not is_player_in_leaderboard(player_uuid) then
+                announce_detail = "\n      \\#FAFF20\\Their first run!\\#FFFFFF\\"
+            elseif is_best_time(player_uuid, run_time_msec) then
+                announce_detail = "\n      \\#FAFF20\\A personal best!\\#FFFFFF\\"
+            end
             local packet = ByteWriter:new()
             packet:u8(ou64_packet_ids.send_run_data)
             packet:u32(timestamp_sec)
@@ -184,7 +202,10 @@ hook_event(HOOK_ON_HUD_RENDER, function()
 
     local anchor_x = 10
     local leaderboard_visible = ou64_leaderboard ~= nil and #ou64_leaderboard > 0 and ou64_settings.show_leaderboard
-    local anchor_y = leaderboard_visible and 258 or 24
+    local anchor_y = 24
+    if leaderboard_visible then
+        anchor_y = (32 * math_min(#ou64_leaderboard, 5)) + 98
+    end
     local top_height = ou64_top_height
 
     -- Gather Players
@@ -264,8 +285,8 @@ hook_event(HOOK_ON_HUD_RENDER, function()
     local percent_done = height / top_height * 100.0
     percent_done = math_max(percent_done, 0)
     local percent_done_str = string.format("%.0f", math_min(percent_done, 100)) .. "%"
-    djui_hud_print_text(percent_done_str, anchor_x - (djui_hud_measure_text(percent_done_str) / 2) + 30, anchor_y + 41, ou64_leaderboard_scale * 0.8)
-    djui_hud_print_colored_text(player_name, anchor_x - (name_length / 2) + 182, anchor_y + 40, ou64_leaderboard_scale, 16)
+    djui_hud_print_text(percent_done_str, anchor_x - (djui_hud_measure_text(percent_done_str) / 2) + 30, anchor_y + 41, 1.0 * 0.8)
+    djui_hud_print_colored_text(player_name, anchor_x - (name_length / 2) + 182, anchor_y + 40, 1.0, 16)
     djui_hud_print_text(string_format("%s", time_string), anchor_x - djui_hud_measure_text(time_string) / 2 + 330, anchor_y + 40, ou64_run_timer_scale)
     djui_hud_print_text(string_format("%s", checkpoints_used), anchor_x - djui_hud_measure_text(checkpoints_used) / 2 + 424, anchor_y + 40, ou64_run_timer_scale)
 
@@ -286,16 +307,16 @@ hook_event(HOOK_ON_HUD_RENDER, function()
         local player_percent_done = entry.height / top_height * 100.0
         player_percent_done = math_max(player_percent_done, 0)
         local player_percent_done_str = string.format("%.0f", math_min(player_percent_done, 100)) .. "%"
-        djui_hud_print_text(player_percent_done_str, anchor_x - (djui_hud_measure_text(player_percent_done_str) / 2) + 30, anchor_y + 41 + y_offset, ou64_leaderboard_scale * 0.8)
+        djui_hud_print_text(player_percent_done_str, anchor_x - (djui_hud_measure_text(player_percent_done_str) / 2) + 30, anchor_y + 41 + y_offset, 0.8)
         render_player_head(entry.idx,
             anchor_x + icon_pad + head_x_pad,
             anchor_y + y_pad + head_y_pad + y_offset,
             1.8,
             1.8
         )
-        djui_hud_print_colored_text(entry_name, anchor_x - (name_length / 2) + 182, anchor_y + 40 + y_offset, ou64_leaderboard_scale, 16)
-        djui_hud_print_text(entry.run_time_str, anchor_x - (run_time_length / 2) + 330, anchor_y + 40 + y_offset, ou64_leaderboard_scale)
-        djui_hud_print_text(checkpoints, anchor_x - (checkpoint_length / 2) + 424, anchor_y + 40 + y_offset, ou64_leaderboard_scale)
+        djui_hud_print_colored_text(entry_name, anchor_x - (name_length / 2) + 182, anchor_y + 40 + y_offset, 1.0, 16)
+        djui_hud_print_text(entry.run_time_str, anchor_x - (run_time_length / 2) + 330, anchor_y + 40 + y_offset, 1.0)
+        djui_hud_print_text(checkpoints, anchor_x - (checkpoint_length / 2) + 424, anchor_y + 40 + y_offset, 1.0)
         y_offset = y_offset + 32
     end
 end)
@@ -304,7 +325,7 @@ end)
 hook_event(HOOK_UPDATE, function()
     local m = gMarioStates[0]
 
-    -- Sync Mario Action
+    -- Sync Mario Action -- TODO: Move to Metrics
     gPlayerSyncTable[0].action = m.action
 
     -- Sync Run Time
@@ -313,19 +334,13 @@ hook_event(HOOK_UPDATE, function()
     else
         gPlayerSyncTable[0].run_time = 0
     end
+end)
 
-    -- Sync Character Height
-    local character_height = math_floor(m.pos.y)
-    if ou64_active then
-        if gNetworkPlayers[0].currLevelNum == _G.ou64_end_level_id then
-            character_height = ou64_top_height
-        else
-            local area_index = m.area.index - 1
-            if area_index < 0 then
-                area_index = 7
-            end
-            character_height = math_floor((ou64_map_pad + (32000 * area_index) + m.pos.y) / 10)
-        end
+-- Warp Hook.
+hook_event(HOOK_ON_WARP, function()
+    if not ou64_flood_active then
+        ou64_warped = true
     end
-    gPlayerSyncTable[0].height = character_height
+
+    return true
 end)

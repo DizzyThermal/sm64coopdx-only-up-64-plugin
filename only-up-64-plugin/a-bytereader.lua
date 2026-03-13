@@ -1,9 +1,8 @@
---- @class ByteReader
-
 -- Localize for performance.
 local string_sub,string_unpack =
       string.sub,string.unpack
 
+--- @class ByteReader
 local ByteReader = {}
 ByteReader.__index = ByteReader
 

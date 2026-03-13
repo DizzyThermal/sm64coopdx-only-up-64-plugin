@@ -1,11 +1,44 @@
--- Localizing for performance.
+-- Localize for performance.
 local is_game_paused,vec3f_copy,mario_drop_held_object,vec3f_set,camera_freeze,camera_unfreeze,allocate_mario_action =
       is_game_paused,vec3f_copy,mario_drop_held_object,vec3f_set,camera_freeze,camera_unfreeze,allocate_mario_action
 
+-- Textures
 local l_button = get_texture_info("l_button")
 local r_button = get_texture_info("r_button")
 
-ACT_SPECTATOR = allocate_mario_action(ACT_GROUP_AIRBORNE | ACT_FLAG_INVULNERABLE)
+-- Spectator Mode State
+local ou64_spectator_warp_time = 0
+local ou64_prev_info_saved = false
+local ou64_spectator_prev_level = _G.ou64_level_id
+local ou64_spectator_prev_area = 1
+local ou64_spectator_prev_pos_x = 0
+local ou64_spectator_prev_pos_y = 0
+local ou64_spectator_prev_pos_z = 0
+local ou64_spectator_prev_face_angle_y = 0
+local ou64_l_button_pressed = false
+local ou64_r_button_pressed = false
+
+-- Spectator Mode State (Global)
+ou64_spectator_mode = false
+ou64_spectator_warping = false
+ou64_camera_index = 0
+
+-- Spectator Mario Action
+local ACT_SPECTATOR = allocate_mario_action(ACT_GROUP_AIRBORNE | ACT_FLAG_INVULNERABLE)
+
+-- Spectator State
+local lLakituStates = {}
+for i = 0, MAX_PLAYERS - 1 do
+    lLakituStates[i] = {
+        pos = { x = 0, y = 0, z = 0, },
+        focus = { x = 0, y = 0, z = 0, },
+        yaw = 0,
+        posHSpeed = 0,
+        posVSpeed = 0,
+        focHSpeed = 0,
+        focVSpeed = 0,
+    }
+end
 
 -- Determines if a player is spectatable.
 --- @param player_index integer
@@ -152,7 +185,11 @@ hook_mario_action(ACT_SPECTATOR, function(m)
         end
     end
 
-    if ou64_camera_index == 0 then
+    if not player_spectatable(ou64_camera_index) then
+        find_next_player(1)
+    end
+
+    if ou64_camera_index == 0 or not are_spectatable_players() then
         exit_spectator_mode(false)
         return
     end

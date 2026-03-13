@@ -1,9 +1,8 @@
---- @class ByteWriter
-
 -- Localize for performance.
 local string_pack,string_sub,string_unpack,table_insert =
       string.pack,string.sub,string.unpack,table.insert
 
+--- @class ByteWriter
 local ByteWriter = {}
 ByteWriter.__index = ByteWriter
 
@@ -25,6 +24,8 @@ function ByteWriter:clear()
     end
 end
 
+-- Returns the serialized buffer and clears it.
+--- @return string
 function ByteWriter:serialize()
     local output = table.concat(self.buffer)
     ByteWriter:clear()

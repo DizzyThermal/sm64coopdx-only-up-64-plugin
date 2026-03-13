@@ -1,10 +1,18 @@
 -- Localize for performance.
-local math_abs,math_max,math_min,string_format =
-      math.abs,math.max,math.min,string.format
+local math_abs,math_floor,math_max,math_min,string_format =
+      math.abs,math.floor,math.max,math.min,string.format
 
+-- Textures
 local height_meter = get_texture_info("height-meter")
 
-function render_character_height()
+-- Character Height Parameters
+local ou64_character_height_scale = 1
+local ou64_character_height_x_pad_negative = 13
+local ou64_character_height_y_pad_negative = 3
+local ou64_map_pad = 16390
+ou64_top_height = 25380
+
+local function render_character_height()
     djui_hud_set_resolution(RESOLUTION_N64)
     djui_hud_set_font(FONT_HUD)
 
@@ -60,7 +68,7 @@ function render_character_height()
     end
 end
 
-function render_height_meter()
+local function render_height_meter()
 	djui_hud_set_font(FONT_NORMAL)
     djui_hud_set_resolution(RESOLUTION_DJUI)
 
@@ -148,4 +156,24 @@ hook_event(HOOK_ON_HUD_RENDER, function()
                 _G.ou64_flood_levels[_G.ou64_flood_area] ~= nil) then
         render_height_meter()
     end
+end)
+
+-- Update Character Height
+hook_event(HOOK_UPDATE, function()
+    local m = gMarioStates[0]
+
+    -- Sync Character Height
+    local character_height = math_floor(m.pos.y)
+    if ou64_active then
+        if gNetworkPlayers[0].currLevelNum == _G.ou64_end_level_id then
+            character_height = ou64_top_height
+        else
+            local area_index = m.area.index - 1
+            if area_index < 0 then
+                area_index = 7
+            end
+            character_height = math_floor((ou64_map_pad + (32000 * area_index) + m.pos.y) / 10)
+        end
+    end
+    gPlayerSyncTable[0].height = character_height
 end)

@@ -1,5 +1,29 @@
+-- Textures
 local d_pad_down = get_texture_info("d_pad_down")
 local d_pad_up = get_texture_info("d_pad_up")
+
+-- Checkpoint State
+local ou64_checkpoint_placed = false
+local ou64_checkpoint_used = false
+local ou64_checkpoint_x = 0
+local ou64_checkpoint_y = 0
+local ou64_checkpoint_z = 0
+local ou64_checkpoint_face_angle_y = 0
+local ou64_checkpoint_cam_pos_x = 0
+local ou64_checkpoint_cam_pos_y = 0
+local ou64_checkpoint_cam_pos_z = 0
+local ou64_checkpoint_cam_focus_x = 0
+local ou64_checkpoint_cam_focus_y = 0
+local ou64_checkpoint_cam_focus_z = 0
+local ou64_checkpoint_cam_yaw = 0
+local ou64_checkpoint_area = 1
+local ou64_checkpoint_warp_time = 0
+
+-- Checkpoint State (Global)
+ou64_checkpoint_count = 0
+gPlayerSyncTable[0].checkpoint_count = 0
+ou64_checkpoint_flag_obj = nil
+ou64_checkpoint_warping = false
 
 local function bhv_checkpoint_flag_init(obj)
     obj.oFlags = OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE
@@ -61,7 +85,7 @@ local function teleport(m)
             m.pos.x = ou64_checkpoint_x
             m.pos.y = ou64_checkpoint_y
             m.pos.z = ou64_checkpoint_z
-            m.faceAngle.y = ou64_checkpoint_faceangle_y
+            m.faceAngle.y = ou64_checkpoint_face_angle_y
             m.vel.x = 0
             m.vel.y = 0
             m.vel.z = 0
@@ -109,7 +133,7 @@ local function checkpoint(m)
             ou64_checkpoint_x = m.pos.x
             ou64_checkpoint_y = m.pos.y
             ou64_checkpoint_z = m.pos.z
-            ou64_checkpoint_faceangle_y = m.faceAngle.y
+            ou64_checkpoint_face_angle_y = m.faceAngle.y
             ou64_checkpoint_cam_pos_x = cam.pos.x
             ou64_checkpoint_cam_pos_y = cam.pos.y
             ou64_checkpoint_cam_pos_z = cam.pos.z
@@ -161,10 +185,13 @@ hook_event(HOOK_MARIO_UPDATE, function(m)
     end
 
     -- Checkpoint / Teleport on Input
-    if bind_cp(m) then
-        checkpoint(m)
-    elseif bind_tp(m) then
-        teleport(m)
+    if ou64_active and
+            not ou64_menu_show_menu then
+        if bind_cp(m) then
+            checkpoint(m)
+        elseif bind_tp(m) then
+            teleport(m)
+        end
     end
 
     -- If warped to different area, teleport again to correct location.
@@ -181,6 +208,7 @@ hook_event(HOOK_ON_HUD_RENDER, function()
             ou64_flood_active or
             not ou64_settings.enable_checkpoints or
             ou64_spectator_mode or
+            ou64_menu_show_menu or
             (ou64_checkpoint_placed and
                 ou64_checkpoint_used) or
             m.action == ACT_END_PEACH_CUTSCENE or
@@ -191,7 +219,7 @@ hook_event(HOOK_ON_HUD_RENDER, function()
     end
 
     -- Checkpoint Tip Parameters
-    djui_hud_set_resolution(RESOLUTION_N64)
+    djui_hud_set_resolution(RESOLUTION_DJUI)
     djui_hud_set_font(FONT_ALIASED)
     local tip_text = "Press         while stationary to place a checkpoint"
     local d_pad_texture = d_pad_down
@@ -200,15 +228,21 @@ hook_event(HOOK_ON_HUD_RENDER, function()
         tip_text = "Press         to teleport to checkpoint"
         d_pad_texture = d_pad_up
     end
-    local tip_scale = 0.3
-    local tip_height = 10
-    local tip_x_pad = 4
+    local tip_scale = 1.5
+    local tip_height = 60
+    local tip_x_pad = 18
     local tip_y_pad = 2
     local tip_width = djui_hud_measure_text(tip_text) * tip_scale
     local tip_x = djui_hud_get_screen_width() / 2 - (tip_width / 2)
-    local tip_y = djui_hud_get_screen_height() - tip_height - 8
-    local d_pad_x_pad = 17
-    local d_pad_scale = 0.075
+    local tip_y = djui_hud_get_screen_height() - tip_height - 16
+
+    -- Text Parameters
+    local text_y_pad = 5
+
+    -- D-PAD Parameters
+    local d_pad_x_pad = 79
+    local d_pad_y_pad = -2
+    local d_pad_scale = 0.5
 
     -- Render Background
     djui_hud_set_adjusted_color(0, 0, 0, 128)
@@ -217,10 +251,10 @@ hook_event(HOOK_ON_HUD_RENDER, function()
     -- Render Checkpoint Tip
     djui_hud_set_adjusted_color(255, 255, 255, 255)
     djui_hud_set_color(255, 255, 255, 255)
-    djui_hud_print_text(tip_text, tip_x, tip_y, tip_scale)
+    djui_hud_print_text(tip_text, tip_x, tip_y + text_y_pad, tip_scale)
 
     -- Render D-PAD Texture
-    djui_hud_render_texture(d_pad_texture, tip_x + d_pad_x_pad, tip_y, d_pad_scale, d_pad_scale)
+    djui_hud_render_texture(d_pad_texture, tip_x + d_pad_x_pad, tip_y + d_pad_y_pad, d_pad_scale, d_pad_scale)
 end)
 
 hook_event(HOOK_ON_SYNC_VALID, function()
