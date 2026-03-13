@@ -40,6 +40,9 @@
 > [!NOTE]
 > This moveset is **NOT** 1:1 with Kaze's Only Up 64 ROM hack, however, PRs are always welcome to help improve it!
 
+> [!TIP]
+> Toggle Only Up 64 moveset in the settings menu (**`[L]`**` + `**`[R]`**)
+
 #### Ground Pound Twirl (A, Z, A)
 
 ![ground-pound-twirl](./resources/ground-pound-twirl.gif)
@@ -83,6 +86,9 @@
 > [!NOTE]
 > Modified djoslin0's Checkpoints v2 plugin to work with the multiple areas of Only Up 64
 
+> [!TIP]
+> Toggle checkpoints in the settings menu (**`[L]`**` + `**`[R]`**)
+
 ### Leaderboard and Run Timer
 
 ![leaderboard](./resources/leaderboard.png)
@@ -95,6 +101,9 @@
 ![run-timer](./resources/run-timer.gif)
 
 > [!NOTE] Run timer tracks run time and checkpoints used and resets if the practice menu is used. 
+
+> [!TIP]
+> Toggle leaderboard and run timer in the settings menu (**`[L]`**` + `**`[R]`**)
 
 ## Changes
 
