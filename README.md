@@ -1,70 +1,100 @@
 # Only Up 64 Plugin (sm64coopdx)
 
 > [!NOTE]
-> This is NOT the [Only Up 64 Map](https://github.com/DizzyThermal/sm64coopdx-only-up-64)
+> This mod is **NOT** the [Only Up 64 Map](https://github.com/DizzyThermal/sm64coopdx-only-up-64), download and install that first
 
 ## Plugin Features
 
-### Warp System (Disabled by Default)
+### Practice Menu
 
-![warp-menu](./resources/warp-menu.gif)
-
-> [!NOTE]
-> To **enable the warp system**, the *host* or *moderator* must type: `/ou64-warps`
-
+![practice-menu](./resources/practice-menu.gif)
 
 > [!TIP]
-> With warps enabled, type: `/ou64-practice` or use keybind: **`[X]`**
+> Enter the menu with the **`[L]`**` + `**`[R]`** keybind
 
-### Toggle Height (Y-Coordinate) on HUD / Player list:
+> [!NOTE]
+> Using the practice menu resets your current run time and checkpoints
 
-> `/ou64-height` - Toggles Character height on HUD and Player List.
+---
+
+### Character Height (Y-Coordinate) on HUD / Playerlist:
+
+> [!TIP]
+> Toggle character height in the settings menu (**`[L]`**` + `**`[R]`**)
 
 ![y-coordinate](./resources/y-coordinate.gif)
 
-### Ground Pound Twirl (A, Z, A)
+---
 
-* _Rollout after twirl is to not allow consecutive ground pound twirls_
+### Character Height Meter on HUD:
+
+> [!TIP]
+> Toggle character height meter in the settings menu (**`[L]`**` + `**`[R]`**)
+
+![height-meter](./resources/height-meter.gif)
+
+---
+
+### Only Up 64 Moveset
+
+> [!NOTE]
+> This moveset is **NOT** 1:1 with Kaze's Only Up 64 ROM hack, however, PRs are always welcome to help improve it!
+
+#### Ground Pound Twirl (A, Z, A)
 
 ![ground-pound-twirl](./resources/ground-pound-twirl.gif)
 
-### Ground Pound Jump (A, Z, A on ground)
+> [!NOTE]
+> The rollout after twirl is to not allow consecutive ground pound twirls
 
-* _Triple front flip animation instead of jump twirl_
+#### Ground Pound Jump (A, Z, A on ground)
 
 ![ground-pound-jump](./resources/ground-pound-jump.gif)
 
-### Ground Pound Dive (A, Z, B)
+> [!NOTE]
+> Triple front flip animation instead of jump twirl (like original ROM hack)
+
+#### Ground Pound Dive (A, Z, B)
 
 ![ground-pound-dive](./resources/ground-pound-dive.gif)
 
-### Wallslide
-
-* _Allows wallslide from long jump_
+#### Wallslide
 
 ![wallslide](./resources/wallslide.gif)
 
-### Instant-Turn
+> [!NOTE]
+> Also allows wallslide out of a long jump
 
-* _Allows for the player to make 180-degree turns when moving slow enough_
+#### Instant-Turn
 
-## Chat Commands
+![instant-turn](./resources/instant-turn.gif)
 
-> `/ou64-height` - Toggles Character height on HUD and Player List
+> [!NOTE]
+> Allows the player to make 180-degree (instant) turns when moving slow enough
 
-> `/ou64-meter` - Toggles Height Meter
+### Checkpoint / Teleport System
 
-> `/ou64-moveset` - Toggles Only Up 64 Moveset
+![checkpoints](./resources/checkpoints.gif)
 
-> `/ou64-checkpoints` - Toggles Checkpointing [Mod Only]
+![checkpoint](./resources/checkpoint.png)
 
-> `/ou64-warps` - Toggles Warps [Mod Only]
+![teleport](./resources/teleport.png)
 
-> `/ou64-practice` - Shows Warp Menu (Must be Enabled)
+> [!NOTE]
+> Modified djoslin0's Checkpoints v2 plugin to work with the multiple areas of Only Up 64
 
-> `/ou64-run-timer` - Toggles Run Timer
+### Leaderboard and Run Timer
 
-> `/ou64-leaderboard` - Toggles Leaderboard
+![leaderboard](./resources/leaderboard.png)
+
+> [!NOTE] View the official leaderboards online at [Dizzy's Abyss](https://dizzysabyss.com))
+
+> [!TIP]
+> Use the D-PAD to page through the entire leaderboard
+
+![run-timer](./resources/run-timer.gif)
+
+> [!NOTE] Run timer tracks run time and checkpoints used and resets if the practice menu is used. 
 
 ## Changes
 
@@ -88,14 +118,12 @@
 
 ## Known Issues
 
-* Ground Pound Twirl ends in a `ACT_FORWARD_ROLLOUT` to make sure you cannot ground pound consecutively. This means Mario
-  does a frontflip before entering free fall.
+* Ground Pound Twirl ends in a `ACT_FORWARD_ROLLOUT` to make sure you cannot ground pound consecutively. This means Mario does a frontflip before entering free fall.
 
 ## Credits
 
-* Ground Pound Jump, Ground Pound Dive, and Wallslide are from `mods/extended-moveset.lua` with some modifications
-* Moveset contributors: @steven3004
+* Moveset: `sm64ex-coop/extended-moveset.lua`, @steven3004
 * Checkpoints: @djoslin0
 * Recolored player heads: @EmilyEmmi
 * sm64coopdx technical help: @cooliokid956, @andre8739
-* Testing help: @retrodarkgamerx, @cooliokid956, @colbyrayz.z64
+* Testing help: @colbyrayz.z64, @cooliokid956, @retrodarkgamerx
