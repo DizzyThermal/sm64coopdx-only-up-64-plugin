@@ -34,25 +34,17 @@
 > [!NOTE]
 > This moveset is **NOT** 1:1 with Kaze's Only Up 64 ROM hack, however, PRs are always welcome to help improve it!
 
----
+![moveset](./resources/moveset.gif)
 
 #### Ground Pound Twirl (A, Z, A)
-
-![ground-pound-twirl](./resources/ground-pound-twirl.gif)
 
 > [!NOTE]
 > The rollout after twirl is to not allow consecutive ground pound twirls
 
----
-
 #### Ground Pound Jump (A, Z, A on ground)
-
-![ground-pound-jump](./resources/ground-pound-jump.gif)
 
 > [!NOTE]
 > Triple front flip animation instead of jump twirl (like original ROM hack)
-
----
 
 #### Ground Pound Dive (A, Z, B)
 
