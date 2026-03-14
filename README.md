@@ -36,7 +36,6 @@
 
 ![moveset](./resources/moveset.gif)
 
-
 #### Ground Pound Jump (A, Z, A on ground)
 
 > [!NOTE]
@@ -49,16 +48,12 @@
 
 #### Ground Pound Dive (A, Z, B)
 
----
-
 #### Wallslide
 
 ![wallslide](./resources/wallslide.gif)
 
 > [!NOTE]
 > Also allows wallslide out of a long jump
-
----
 
 #### Instant-Turn
 
