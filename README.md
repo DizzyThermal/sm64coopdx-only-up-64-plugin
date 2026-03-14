@@ -7,9 +7,7 @@
 
 ### Practice Menu
 
-<video style="display: block; margin: 0 auto;" controls muted autoplay loop>
-  <source src="./resources/practice-menu.webm" type="video/webm">
-</video>
+![practice-menu](./resources/practice-menu.gif)
 
 > [!TIP]
 > Enter the menu with the **`[L]`**` + `**`[R]`** keybind
