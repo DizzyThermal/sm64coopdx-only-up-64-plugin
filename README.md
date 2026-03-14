@@ -36,19 +36,18 @@
 
 ![moveset](./resources/moveset.gif)
 
-#### Ground Pound Twirl (A, Z, A)
-
-> [!NOTE]
-> The rollout after twirl is to not allow consecutive ground pound twirls
 
 #### Ground Pound Jump (A, Z, A on ground)
 
 > [!NOTE]
 > Triple front flip animation instead of jump twirl (like original ROM hack)
 
-#### Ground Pound Dive (A, Z, B)
+#### Ground Pound Twirl (A, Z, A)
 
-![ground-pound-dive](./resources/ground-pound-dive.gif)
+> [!NOTE]
+> The rollout after twirl is to not allow consecutive ground pound twirls
+
+#### Ground Pound Dive (A, Z, B)
 
 ---
 
