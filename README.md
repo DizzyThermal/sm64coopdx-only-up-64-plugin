@@ -21,17 +21,11 @@
 
 ### Character Height (Y-Coordinate) on HUD / Playerlist:
 
-> [!TIP]
-> Toggle character height in the settings menu (**`[L]`**` + `**`[R]`**)
-
 ![y-coordinate](./resources/y-coordinate.gif)
 
 ---
 
 ### Character Height Meter on HUD:
-
-> [!TIP]
-> Toggle character height meter in the settings menu (**`[L]`**` + `**`[R]`**)
 
 ![height-meter](./resources/height-meter.gif)
 
@@ -41,9 +35,6 @@
 
 > [!NOTE]
 > This moveset is **NOT** 1:1 with Kaze's Only Up 64 ROM hack, however, PRs are always welcome to help improve it!
-
-> [!TIP]
-> Toggle Only Up 64 moveset in the settings menu (**`[L]`**` + `**`[R]`**)
 
 ---
 
@@ -98,10 +89,7 @@
 ![teleport](./resources/teleport.png)
 
 > [!NOTE]
-> Modified djoslin0's Checkpoints v2 plugin to work with the multiple areas of Only Up 64
-
-> [!TIP]
-> Toggle checkpoints in the settings menu (**`[L]`**` + `**`[R]`**)
+> This is a modified version of djoslin0's Checkpoints v2 plugin to work with the multiple areas of Only Up 64
 
 ---
 
@@ -118,10 +106,7 @@
 ![run-timer](./resources/run-timer.gif)
 
 > [!NOTE]
-> Run timer tracks run time and checkpoints used and resets if the practice menu is used. 
-
-> [!TIP]
-> Toggle leaderboard and run timer in the settings menu (**`[L]`**` + `**`[R]`**)
+> Run timer tracks run time and checkpoints used and resets if the practice menu is used
 
 ---
 
